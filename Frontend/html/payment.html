@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Payment - आranyak</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body class="payment-page">
+
+    <nav>
+        <h1>आranyak</h1>
+
+        <div class="nav-links">
+            <a href="../html/index.html">Home</a>
+            <a href="../html/map.html">Map</a>
+            <a href="../html/safariDetail.html">Safari</a>
+            <a href="../html/AdminPanel.html">Admin</a>
+        </div>
+    </nav>
+
+    <div class="payment-wrapper">
+        <div class="payment-container">
+
+            <h2>Complete Payment</h2>
+
+            <div id="details"></div>
+
+            <h3>Select Payment Method</h3>
+
+            <div class="methods">
+                <button onclick="selectMethod('GPay')">GPay</button>
+                <button onclick="selectMethod('PhonePe')">PhonePe</button>
+                <button onclick="selectMethod('Paytm')">Paytm</button>
+            </div>
+
+            <button class="pay-btn" onclick="payNow()">Pay Now</button>
+
+            <p id="status"></p>
+
+        </div>
+    </div>
+    
+
+    <script defer src="../js/script.js"></script>
+
+</body>
+</html>

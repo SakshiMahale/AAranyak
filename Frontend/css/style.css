@@ -395,17 +395,28 @@ input {
     gap: 10px;
 }
 
+select {
+    width: 100%;
+    padding: 8px;
+    border-radius: 8px;
+    margin: 8px 0;
+}
+
 .ticket-box {
-    width: 40px;
-    height: 40px;
+    width: 45px;
+    height: 45px;
     background: #1b3d1b;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    border-radius: 5px;
+    border-radius: 8px;
+    transition: 0.3s;
 }
 
+.ticket-box:hover {
+    transform: scale(1.1);
+}
 .ticket-box.selected {
     background: #4CAF50;
 }
@@ -677,4 +688,76 @@ button {
 .toggle-buttons button.active {
     background-color: #4CAF50;
     color: white;
+}
+
+/*=========================== PAYMENT PAGE (SAFE SCOPED) ===========================*/
+
+body.payment-page {
+    background: #0b2e13;
+    color: white;
+}
+
+/* Wrapper for centering */
+.payment-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 80px); /* leaves space for navbar */
+}
+
+/* Payment container */
+.payment-container {
+    background: #123d1c;
+    padding: 30px;
+    border-radius: 12px;
+    width: 350px;
+    text-align: center;
+    margin: 40px auto;
+}
+
+/* Payment methods buttons */
+.payment-container .methods button {
+    margin: 10px;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 8px;
+    background: #1b5e20;
+    color: white;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.payment-container .methods button:hover {
+    background: #4CAF50;
+    transform: scale(1.05);
+}
+
+/* Pay button */
+.payment-container .pay-btn {
+    margin-top: 20px;
+    padding: 12px;
+    width: 100%;
+    background: #4CAF50;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.payment-container .pay-btn:hover {
+    background: #45a049;
+    transform: scale(1.03);
+}
+
+/* Status text */
+.payment-container #status {
+    margin-top: 15px;
+    font-weight: bold;
+}
+
+/* Payment details text */
+.payment-container #details {
+    margin-bottom: 15px;
+    font-size: 14px;
+    opacity: 0.9;
 }
