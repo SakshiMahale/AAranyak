@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Jeep Management</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="icon" type="image/x-icon" href="../assets/vine.png">
+    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
+
+    <style>
+        body {
+            background: linear-gradient(to bottom, #0f2f1f, #1e4d2b);
+            color: white;
+            font-family: sans-serif;
+            text-align: center;
+        }
+
+        h1 {
+            margin-top: 20px;
+        }
+
+        .container {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 30px;
+        }
+
+        .box {
+            width: 40%;
+            padding: 20px;
+            border-radius: 15px;
+            background: rgba(0, 0, 0, 0.4);
+            box-shadow: 0 0 20px rgba(0, 255, 100, 0.3);
+        }
+
+        .jeep {
+            background: #2ecc71;
+            margin: 10px;
+            padding: 10px;
+            border-radius: 10px;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .waiting {
+            background: #f39c12;
+        }
+
+        .controls {
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 10px;
+            background: #27ae60;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #2ecc71;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 🌿 NAVBAR -->
+    <nav>
+        <h1>आranyak</h1>
+
+        <div class="nav-links">
+            <a href="../html/index.html">Home</a>
+            <a href="../html/ticket.html">Online Ticket Booking</a>
+            <a href="../html/map.html">Map of आranyak</a>
+            <a href="../html/safariDetail.html">Safari Details</a>
+            <a href="../html/AdminPanel.html">Admin Panel</a>
+            <!-- Admin path placeholder -->
+        </div>
+    </nav>
+
+    <h1>🚙 Safari Jeep Tracker 🌿</h1>
+
+    <div class="controls">
+        <button onclick="addJeep()">Add Jeep</button>
+        <button onclick="removeJeep()">Checkout Jeep</button>
+    </div>
+
+    <div class="container">
+
+        <!-- ACTIVE -->
+        <div class="box">
+            <h2>🌿 Active Jeeps (Max 6)</h2>
+            <div id="active"></div>
+        </div>
+
+        <!-- WAITING -->
+        <div class="box">
+            <h2>⏳ Waiting Jeeps</h2>
+            <div id="waiting"></div>
+        </div>
+
+    </div>
+
+    <script>
+        let activeJeeps = [];
+        let waitingJeeps = [];
+        let jeepCount = 0;
+
+        // ➕ Add Jeep
+        function addJeep() {
+            jeepCount++;
+            let jeep = {
+                id: "Jeep " + jeepCount,
+                time: 0
+            };
+
+            if (activeJeeps.length < 6) {
+                activeJeeps.push(jeep);
+            } else {
+                waitingJeeps.push(jeep);
+            }
+
+            render();
+        }
+
+        // ❌ Remove Jeep (checkout)
+        function removeJeep() {
+            if (activeJeeps.length === 0) return;
+
+            activeJeeps.shift(); // remove first jeep
+
+            // bring next from waiting
+            if (waitingJeeps.length > 0) {
+                activeJeeps.push(waitingJeeps.shift());
+            }
+
+            render();
+        }
+
+        // ⏱️ Timer update
+        setInterval(() => {
+            activeJeeps.forEach(j => j.time++);
+            render();
+        }, 1000);
+
+        // 🎨 Render UI
+        function render() {
+            const activeDiv = document.getElementById("active");
+            const waitingDiv = document.getElementById("waiting");
+
+            activeDiv.innerHTML = "";
+            waitingDiv.innerHTML = "";
+
+            activeJeeps.forEach(j => {
+                activeDiv.innerHTML += `
+            <div class="jeep">
+                ${j.id} 🚙 <br>
+                Time: ${j.time}s
+            </div>
+        `;
+            });
+
+            waitingJeeps.forEach(j => {
+                waitingDiv.innerHTML += `
+            <div class="jeep waiting">
+                ${j.id} ⏳ Waiting
+            </div>
+        `;
+            });
+        }
+    </script>
+    <footer>
+        <p><b>Project:</b> आranyak Safari Management System</p>
+        <p>By: (VJTI) {Vithika Surve, Sakshi Mahale, Bhakti Baraf}, (VESIT){ Vibhuti Sawant} </p>
+        <p>Goal: Ensuring wildlife safety and intelligent monitoring.</p>
+    </footer>
+
+</body>
+
+</html>
