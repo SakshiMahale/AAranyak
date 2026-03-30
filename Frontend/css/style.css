@@ -1,3 +1,4 @@
+/*=========================NAVBAR=================================================*/
 .navbar {
     display: flex;
     align-items: center;
@@ -59,7 +60,7 @@ model-viewer {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 }
 
-/*Index.html page*/
+/*========================================Index.html page=======================================*/
 body {
     margin: 0;
     font-family: Arial;
@@ -226,7 +227,7 @@ model-viewer {
     opacity: 0.8;
 }
 
-/* 🦶 FOOTER */
+/* ================================== FOOTER ===========================================================*/
 footer {
     margin-top: 50px;
     text-align: center;
@@ -290,7 +291,7 @@ footer {
     border-radius: 10px;
 }
 
-/*Online Ticke Booking system*/
+/*====================================Online Ticke Booking system=========================================*/
 body {
     margin: 0;
     font-family: Arial;
@@ -426,7 +427,7 @@ button {
     margin-top: 10px;
 }
 
-/*Safari Details*/
+/*==================================Safari Details=======================================*/
 /* 🌿 Safari Page */
 .safari-info {
     text-align: center;
@@ -482,7 +483,7 @@ button {
     margin: 10px 0;
 }
 
-/*Admin Login*/
+/*============================Admin Login================================================*/
 
 
 /* Form container */
@@ -551,7 +552,7 @@ button {
     transform: scale(1.03);
 }
 
-/*Register/Login User*/
+/*==========================================Register/Login User===========================================*/
 /* Container for the whole page */
 .user-auth-section {
     display: flex;

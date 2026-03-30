@@ -1,3 +1,5 @@
+
+//=============================LOGIN/Register USER===============================================
 document.addEventListener("DOMContentLoaded", function () {
     const loginBtn = document.getElementById('loginBtn');
     const registerBtn = document.getElementById('registerBtn');
@@ -32,3 +34,4 @@ document.addEventListener("DOMContentLoaded", function () {
     if (switchToRegister) switchToRegister.addEventListener('click', showRegister);
     if (switchToLogin) switchToLogin.addEventListener('click', showLogin);
 });
+

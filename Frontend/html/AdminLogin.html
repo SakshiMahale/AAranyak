@@ -31,9 +31,10 @@
             <p>Enter your credentials to access the dashboard</p>
 
             <form id="adminLoginForm">
-                <input type="text" id="username" placeholder="Username" required>
-                <input type="password" id="password" placeholder="Password" required>
-                <button type="submit">Login</button>
+                <input type="text" id="adminUsername" placeholder="Username">
+                <input type="password" id="adminPassword" placeholder="Password">
+
+                <button onclick="adminLogin()">Login</button>
             </form>
 
             <p id="loginError"></p>
