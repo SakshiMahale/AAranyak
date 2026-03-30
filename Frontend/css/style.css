@@ -1,0 +1,462 @@
+.navbar {
+    display: flex;
+    align-items: center;
+    /* 🔥 THIS FIXES VERTICAL ALIGNMENT */
+    justify-content: space-between;
+    padding: 15px 40px;
+    background: #102510;
+}
+
+/* Logo */
+.logo {
+    font-size: 26px;
+    font-weight: bold;
+    color: #4CAF50;
+    line-height: 1;
+    /* 🔥 prevents extra height */
+}
+
+/* Links container */
+.nav-links {
+    display: flex;
+    align-items: center;
+    /* 🔥 aligns links properly */
+    gap: 25px;
+}
+
+/* Links */
+.nav-links a {
+    color: white;
+    text-decoration: none;
+    font-size: 16px;
+    line-height: 1;
+    /* 🔥 keeps text aligned */
+    padding: 5px 0;
+    /* 🔥 balances vertical spacing */
+    transition: 0.3s;
+}
+
+.nav-links a:hover {
+    color: #4CAF50;
+}
+
+model-viewer {
+    background: transparent;
+    filter: drop-shadow(0 0 15px #4CAF50);
+}
+
+#map {
+    height: 100vh;
+    width: 100%;
+}
+
+.leaflet-tooltip {
+    background: #102510;
+    color: white;
+    border-radius: 10px;
+    padding: 5px;
+    border: none;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+/*Index.html page*/
+body {
+    margin: 0;
+    font-family: Arial;
+    background: #0b1d0b;
+    color: white;
+}
+
+/* 🌿 NAVBAR */
+nav {
+    display: flex;
+    justify-content: space-between;
+    padding: 15px 40px;
+    background: #102510;
+    box-shadow: 0 2px 10px black;
+}
+
+nav h1 {
+    color: #4CAF50;
+}
+
+.nav-links a {
+    margin: 0 10px;
+    color: white;
+    text-decoration: none;
+    transition: 0.3s;
+}
+
+.nav-links a:hover {
+    color: #4CAF50;
+}
+
+/* 👤 ROLE */
+.role-select {
+    text-align: center;
+    margin: 40px;
+}
+
+.role-select button {
+    margin: 10px;
+    padding: 10px 20px;
+    border: none;
+    background: #4CAF50;
+    color: white;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.role-select button:hover {
+    transform: scale(1.1);
+}
+
+/* 🌿 ANIMAL GRID */
+.animals {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 30px;
+    padding: 40px;
+}
+
+/* 🐾 CARD DESIGN */
+/* 🐾 Animal Images Same Size */
+.animal-card img {
+    width: 100%;
+    height: 180px;
+    /* 🔥 fixed height */
+    object-fit: cover;
+    /* 🔥 keeps image nice (no stretch) */
+    border-radius: 10px;
+}
+
+.animal-card {
+    background: #102510;
+    border-radius: 20px;
+    padding: 20px;
+    text-align: center;
+    transition: 0.4s;
+    position: relative;
+    overflow: hidden;
+}
+
+/* 🌟 Glow effect */
+.animal-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 20px;
+    background: radial-gradient(circle at top, rgba(76, 175, 80, 0.2), transparent);
+    opacity: 0;
+    transition: 0.4s;
+}
+
+.animal-card:hover::before {
+    opacity: 1;
+}
+
+/* 🌀 Hover animation */
+.animal-card:hover {
+    transform: translateY(-10px) scale(1.05);
+    box-shadow: 0 0 25px #4CAF50;
+}
+
+/* 🐾 Images */
+.animal-card img {
+    width: 120px;
+    filter: drop-shadow(0 0 10px #4CAF50);
+}
+
+.animal-card img {
+    transition: 0.4s;
+}
+
+.animal-card:hover img {
+    transform: scale(1.1);
+}
+
+/* 🐅 3D MODEL */
+model-viewer {
+    width: 100%;
+    height: 180px;
+    filter: drop-shadow(0 0 15px #4CAF50);
+}
+
+/* 🔄 rotation for images */
+.rotate {
+    animation: spin 6s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotateY(0deg);
+    }
+
+    100% {
+        transform: rotateY(360deg);
+    }
+}
+
+/* 📝 text */
+.animal-card h3 {
+    margin-top: 10px;
+}
+
+.animal-card p {
+    font-size: 14px;
+    opacity: 0.8;
+}
+
+/* 🦶 FOOTER */
+footer {
+    margin-top: 50px;
+    text-align: center;
+    padding: 20px;
+    background: #061306;
+}
+
+.jungle-area {
+    display: flex;
+    justify-content: space-around;
+    margin: 60px;
+}
+
+/* 🐾 Animal container */
+.animal {
+    text-align: center;
+    color: white;
+}
+
+/* 💀 Skeleton Glow Effect */
+.animal img {
+    width: 120px;
+    filter: brightness(0) invert(1) drop-shadow(0 0 8px #4CAF50) drop-shadow(0 0 20px #4CAF50);
+}
+
+/* 🔄 ROTATION (KEY PART) */
+.rotate {
+    animation: rotateAnimal 6s linear infinite,
+        breathe 2s ease-in-out infinite;
+}
+
+/* 🔄 Smooth 360 rotation */
+@keyframes rotateAnimal {
+    0% {
+        transform: rotateY(0deg);
+    }
+
+    100% {
+        transform: rotateY(360deg);
+    }
+}
+
+/* 💓 Breathing effect */
+@keyframes breathe {
+
+    0%,
+    100% {
+        transform: scale(1) rotateY(0deg);
+    }
+
+    50% {
+        transform: scale(1.1) rotateY(180deg);
+    }
+}
+
+/* 🧠 Info box */
+.animal p {
+    margin-top: 10px;
+    background: rgba(0, 0, 0, 0.6);
+    padding: 8px;
+    border-radius: 10px;
+}
+
+/*Online Ticke Booking system*/
+body {
+    margin: 0;
+    font-family: Arial;
+    background: #0b1d0b;
+    color: white;
+}
+
+/* Navbar */
+.navbar {
+    padding: 15px 40px;
+    background: #102510;
+}
+
+.logo {
+    color: #4CAF50;
+    font-size: 24px;
+}
+
+/* Container */
+.container {
+    width: 350px;
+    margin: 40px auto;
+    background: #102510;
+    padding: 20px;
+    border-radius: 15px;
+}
+
+/* Inputs */
+input {
+    width: 100%;
+    margin: 8px 0;
+    padding: 8px;
+    border-radius: 8px;
+    border: none;
+}
+
+/*ONLINE TICKET BOOKING*/
+.navbar {
+    display: flex;
+    align-items: center;
+    /* 🔥 THIS FIXES VERTICAL ALIGNMENT */
+    justify-content: space-between;
+    padding: 15px 40px;
+    background: #102510;
+}
+
+/* Logo */
+.logo {
+    font-size: 26px;
+    font-weight: bold;
+    color: #4CAF50;
+    line-height: 1;
+    /* 🔥 prevents extra height */
+}
+
+/* Links container */
+.nav-links {
+    display: flex;
+    align-items: center;
+    /* 🔥 aligns links properly */
+    gap: 25px;
+}
+
+/* Links */
+.nav-links a {
+    color: white;
+    text-decoration: none;
+    font-size: 16px;
+    line-height: 1;
+    /* 🔥 keeps text aligned */
+    padding: 5px 0;
+    /* 🔥 balances vertical spacing */
+    transition: 0.3s;
+}
+
+.nav-links a:hover {
+    color: #4CAF50;
+}
+
+#map {
+    height: 100vh;
+    width: 100%;
+}
+
+.leaflet-tooltip {
+    background: #102510;
+    color: white;
+    border-radius: 10px;
+    padding: 5px;
+    border: none;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+/* Ticket cubes */
+.tickets {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.ticket-box {
+    width: 40px;
+    height: 40px;
+    background: #1b3d1b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.ticket-box.selected {
+    background: #4CAF50;
+}
+
+/* Button */
+button {
+    width: 100%;
+    padding: 10px;
+    background: #4CAF50;
+    border: none;
+    margin-top: 10px;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+/* Warning */
+#warning {
+    color: red;
+    margin-top: 10px;
+}
+
+/*Safari Details*/
+/* 🌿 Safari Page */
+.safari-info {
+    text-align: center;
+    padding: 40px;
+    background: #061306;
+}
+
+.safari-info h2 {
+    color: #4CAF50;
+}
+
+.safari-info p {
+    max-width: 700px;
+    margin: auto;
+    line-height: 1.6;
+}
+
+/* ⚠️ Rules */
+.rules {
+    padding: 40px;
+}
+
+.rules-container {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    flex-wrap: wrap;
+}
+
+.card {
+    width: 250px;
+    background: #102510;
+    padding: 20px;
+    border-radius: 15px;
+    transition: 0.3s;
+}
+
+.card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px #4CAF50;
+}
+
+.card h3 {
+    text-align: center;
+}
+
+.card ul {
+    list-style: none;
+    padding: 0;
+}
+
+.card li {
+    margin: 10px 0;
+}

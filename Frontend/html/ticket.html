@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Online Ticket Booking - आranyak</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body>
+
+    <!-- 🌿 NAVBAR -->
+    <nav>
+        <h1>आranyak</h1>
+
+        <div class="nav-links">
+            <a href="../html/index.html">Home </a>
+            <a href="../html/map.html">Map of आranyak</a>
+            <a href="../html/safariDetail.html">Safari Details</a>
+            <a href="#">Search</a>
+            <a href="../html/AdminPanel.html">Admin Panel</a>
+            <!-- Admin path placeholder -->
+            <a href="#">Admin Panel</a>
+        </div>
+    </nav>
+
+    <div class="container">
+
+        <h2>🌿 Safari Ticket Booking</h2>
+
+        <!-- Name -->
+        <input type="text" id="name" placeholder="Enter Name">
+
+        <!-- Age -->
+        <input type="number" id="age" placeholder="Enter Age">
+
+        <!-- Date -->
+        <input type="date" id="date">
+
+        <!-- Time -->
+        <input type="time" id="time">
+
+        <!-- Ticket cubes -->
+        <h3>SELECT TICKETS BASED ON GENDER</h3>
+        <div class="tickets" id="ticketBox"></div>
+
+        <!-- Category -->
+        <h3>Category Count </h3>
+
+        <label>Male</label>
+        <input type="number" id="male" min="0" value="0">
+
+        <label>Female</label>
+        <input type="number" id="female" min="0" value="0">
+
+        <label>Child</label>
+        <input type="number" id="child" min="0" value="0">
+
+        <!-- Total -->
+        <h3 id="total">Total: ₹0</h3>
+
+        <button onclick="bookTicket()">Book Ticket</button>
+
+        <p id="warning"></p>
+
+    </div>
+
+    <script defer src="../js/script.js"></script>
+
+</body>
+
+</html>

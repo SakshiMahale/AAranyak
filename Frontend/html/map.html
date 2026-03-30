@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Safari Jungle Map</title>
+
+    <!-- Leaflet CSS -->
+    <!-- 🌿 Main CSS -->
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial;
+            background: #0b1d0b;
+        }
+
+        #map {
+            height: 100vh;
+            width: 100%;
+        }
+
+        /* Jungle overlay effect */
+        .leaflet-container {
+            background: #1b3d1b;
+        }
+
+        /* Custom marker animation */
+        .pulse {
+            width: 20px;
+            height: 20px;
+            background: red;
+            border-radius: 50%;
+            position: relative;
+        }
+
+        .pulse::after {
+            content: '';
+            width: 20px;
+            height: 20px;
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 0, 0, 0.5);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            100% {
+                transform: scale(2.5);
+                opacity: 0;
+            }
+        }
+    </style>
+
+</head>
+
+<body>
+    <nav>
+        <h1>आranyak</h1>
+
+        <div class="nav-links">
+            <a href="../html/index.html">Home </a>
+            <a href="../html/ticket.html">Online Ticket Booking</a>
+            <a href="../html/safariDetail.html">Safari Details</a>
+            <a href="../html/AdminPanel.html">Admin Panel</a>
+
+            <a href="#">Search</a>
+
+        </div>
+    </nav>
+
+    <div id="map"></div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+    <!-- Heatmap Plugin -->
+    <script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
+
+    <script src="../js/script.js"></script>
+
+</body>
+
+</html>
