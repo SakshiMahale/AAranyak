@@ -92,24 +92,42 @@ nav h1 {
 }
 
 /* 👤 ROLE */
+
 .role-select {
+    display: flex;
+    flex-direction: column;
+    /* keep heading on top */
+    justify-content: center;
+    align-items: center;
+    /* center heading and buttons container */
+    margin: 40px auto;
     text-align: center;
-    margin: 40px;
+    gap: 20px;
+    /* space between heading and buttons row */
 }
 
-.role-select button {
-    margin: 10px;
+/* make the buttons row horizontal */
+.role-select .buttons-row {
+    display: flex;
+    justify-content: center;
+    /* center buttons horizontally */
+    gap: 20px;
+    /* space between Admin and User buttons */
+}
+
+.role-btn {
+    display: inline-block;
     padding: 10px 20px;
-    border: none;
-    background: #4CAF50;
+    margin: 10px;
+    background-color: #4CAF50;
     color: white;
-    border-radius: 20px;
-    cursor: pointer;
-    transition: 0.3s;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: bold;
 }
 
-.role-select button:hover {
-    transform: scale(1.1);
+.role-btn:hover {
+    background-color: #45a049;
 }
 
 /* 🌿 ANIMAL GRID */
@@ -352,10 +370,13 @@ input {
     color: #4CAF50;
 }
 
+/*Map page*/
+
 #map {
     height: 100vh;
     width: 100%;
 }
+
 
 .leaflet-tooltip {
     background: #102510;
@@ -459,4 +480,200 @@ button {
 
 .card li {
     margin: 10px 0;
+}
+
+/*Admin Login*/
+
+
+/* Form container */
+.login-card {
+    background: #102510;
+    /* dark green background */
+    padding: 40px 30px;
+    /* space inside the card */
+    border-radius: 15px;
+    /* rounded corners */
+    width: 350px;
+    /* fixed width for nice alignment */
+    margin: 40px auto;
+    /* center horizontally */
+    box-shadow: 0 0 25px rgba(76, 175, 80, 0.5);
+    /* subtle green glow */
+    display: flex;
+    flex-direction: column;
+    /* stack elements vertically */
+    align-items: center;
+    /* center inputs/buttons */
+    text-align: center;
+    /* center text inside */
+    gap: 20px;
+    /* space between elements */
+}
+
+/* Form inputs */
+#adminLoginForm input {
+    width: 100%;
+    /* fill the container width */
+    padding: 12px 15px;
+    /* comfortable padding */
+    border-radius: 10px;
+    border: none;
+    font-size: 16px;
+    outline: none;
+    background: #061306;
+    /* slightly darker inside */
+    color: white;
+    box-sizing: border-box;
+}
+
+/* Input placeholder color */
+#adminLoginForm input::placeholder {
+    color: #a5a5a5;
+    /* soft gray */
+}
+
+/* Submit button */
+#adminLoginForm button {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 10px;
+    background: #4CAF50;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+/* Button hover effect */
+#adminLoginForm button:hover {
+    background: #45a049;
+    transform: scale(1.03);
+}
+
+/*Register/Login User*/
+/* Container for the whole page */
+.user-auth-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: linear-gradient(135deg, #061306, #0b1d0b);
+}
+
+/* Card holding toggle + forms */
+.auth-card {
+    background: #102510;
+    padding: 40px 30px;
+    border-radius: 15px;
+    width: 400px;
+    box-shadow: 0 0 30px rgba(76, 175, 80, 0.5);
+    text-align: center;
+}
+
+/* Toggle buttons */
+.toggle-buttons {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 30px;
+    gap: 20px;
+}
+
+.toggle-buttons button {
+    padding: 10px 30px;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    background: #061306;
+    color: #fff;
+    transition: 0.3s;
+}
+
+.toggle-buttons button.active,
+.toggle-buttons button:hover {
+    background: #4CAF50;
+    color: white;
+    transform: scale(1.05);
+}
+
+/* Forms */
+.forms-container form {
+    display: none;
+    /* hide by default */
+    flex-direction: column;
+    gap: 15px;
+}
+
+.forms-container form.active-form {
+    display: flex;
+    /* show active form */
+}
+
+/* Form titles */
+.forms-container h2 {
+    margin-bottom: 20px;
+    color: #4CAF50;
+}
+
+/* Inputs */
+.forms-container input {
+    padding: 12px 15px;
+    border-radius: 10px;
+    border: none;
+    outline: none;
+    width: 100%;
+    font-size: 16px;
+    background: #061306;
+    color: white;
+}
+
+/* Placeholder styling */
+.forms-container input::placeholder {
+    color: #a5a5a5;
+}
+
+/* Buttons */
+.forms-container button {
+    padding: 12px;
+    border: none;
+    border-radius: 10px;
+    background: #4CAF50;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.forms-container button:hover {
+    background: #45a049;
+    transform: scale(1.03);
+}
+
+/* Switch message */
+.switch-msg {
+    font-size: 14px;
+    color: #a5a5a5;
+}
+
+.switch-msg span {
+    color: #4CAF50;
+    cursor: pointer;
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+.forms-container form {
+    display: none;
+    transition: all 0.3s ease;
+}
+
+.forms-container form.active-form {
+    display: block;
+}
+
+.toggle-buttons button.active {
+    background-color: #4CAF50;
+    color: white;
 }

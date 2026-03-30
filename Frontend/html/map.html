@@ -5,28 +5,34 @@
     <title>Safari Jungle Map</title>
 
     <!-- Leaflet CSS -->
-    <!-- 🌿 Main CSS -->
-    <link rel="stylesheet" href="../css/style.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="icon" type="image/x-icon" href="../assets/vine.png">
 
     <style>
+        /* Reset and ensure map fills screen */
+        html,
         body {
+            height: 100%;
             margin: 0;
+            padding: 0;
             font-family: Arial;
             background: #0b1d0b;
         }
 
+        /* Map container */
         #map {
-            height: 100vh;
+            height: calc(100vh - 70px - 80px);
+            /* full height minus nav + footer */
             width: 100%;
         }
 
-        /* Jungle overlay effect */
+        /* Jungle effect */
         .leaflet-container {
             background: #1b3d1b;
         }
 
-        /* Custom marker animation */
+        /* Red pulse markers */
         .pulse {
             width: 20px;
             height: 20px;
@@ -56,35 +62,95 @@
                 opacity: 0;
             }
         }
-    </style>
 
+        /* Nav and footer styles */
+        nav {
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 40px;
+            background: #102510;
+            color: white;
+            z-index: 1000;
+            position: relative;
+        }
+
+        footer {
+            height: 80px;
+            text-align: center;
+            padding: 20px;
+            background: #061306;
+            color: white;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            margin-left: 20px;
+        }
+
+        .nav-links a:hover {
+            color: #4CAF50;
+        }
+    </style>
 </head>
 
 <body>
     <nav>
         <h1>आranyak</h1>
-
         <div class="nav-links">
             <a href="../html/index.html">Home </a>
             <a href="../html/ticket.html">Online Ticket Booking</a>
             <a href="../html/safariDetail.html">Safari Details</a>
             <a href="../html/AdminPanel.html">Admin Panel</a>
-
-            <a href="#">Search</a>
-
         </div>
     </nav>
 
     <div id="map"></div>
 
+    <footer>
+        <p><b>Project:</b> आranyak Safari Management System</p>
+        <p>By: (VJTI) {Vithika Surve, Sakshi Mahale, Bhakti Baraf}, (VESIT){ Vibhuti Sawant} </p>
+        <p>Goal: Ensuring wildlife safety and intelligent monitoring.</p>
+    </footer>
+
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-
-    <!-- Heatmap Plugin -->
     <script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
 
-    <script src="../js/script.js"></script>
+    <script>
+        // 1️⃣ Initialize the map in the div "map"
+        const map = L.map('map', {
+            crs: L.CRS.Simple, // use simple coordinate system for image
+            minZoom: -2
+        });
 
+        // 2️⃣ Dimensions of your jungle image
+        const w = 2000; // width of image in pixels
+        const h = 1500; // height of image in pixels
+        const bounds = [[0, 0], [h, w]]; // top-left & bottom-right
+
+        // 3️⃣ Add your image as map
+        L.imageOverlay('jungle-map.jpeg', bounds).addTo(map);
+
+        // 4️⃣ Set initial view
+        map.fitBounds(bounds);
+
+        // 5️⃣ Example animal occurrence markers
+        // You need to provide coordinates in image coordinate system [y, x]
+        const animals = [
+            [300, 400],
+            [500, 800],
+            [1000, 1500]
+        ];
+
+        animals.forEach(coord => {
+            L.marker(coord, {
+                icon: L.divIcon({ className: 'pulse' })
+            }).addTo(map);
+        });
+    </script>
 </body>
 
 </html>

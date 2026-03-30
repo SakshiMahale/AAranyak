@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Admin Login</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="icon" type="image/x-icon" href="../assets/vine.png">
+    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
+</head>
+
+<body>
+
+    <!-- 🌿 NAVBAR -->
+    <nav>
+        <h1>आranyak</h1>
+
+        <div class="nav-links">
+            <a href="../html/index.html">Home</a>
+            <a href="../html/ticket.html">Online Ticket Booking</a>
+            <a href="../html/map.html">Map of आranyak</a>
+            <a href="../html/safariDetail.html">Safari Details</a>
+            <a href="../html/AdminPanel.html">Admin Panel</a>
+            <!-- Admin path placeholder -->
+        </div>
+    </nav>
+    <section class="user-auth-section">
+        <div class="auth-card">
+
+            <!-- Toggle Buttons -->
+            <!-- Toggle Buttons -->
+            <div class="toggle-buttons">
+                <button type="button" id="loginBtn" class="active">Login</button>
+                <button type="button" id="registerBtn">Register</button>
+            </div>
+
+            <!-- Forms Container -->
+            <div class="forms-container">
+
+                <!-- Login Form -->
+                <form id="loginForm" class="active-form">
+                    <h2>Login</h2>
+                    <input type="text" id="loginUsername" placeholder="Username" required>
+                    <input type="password" id="loginPassword" placeholder="Password" required>
+                    <button type="submit">Login</button>
+                    <p class="switch-msg">Don't have an account? <span id="switchToRegister">Register</span></p>
+                </form>
+
+                <!-- Register Form -->
+                <form id="registerForm">
+                    <h2>Register</h2>
+                    <input type="text" id="regUsername" placeholder="Username" required>
+                    <input type="email" id="regEmail" placeholder="Email" required>
+                    <input type="password" id="regPassword" placeholder="Password" required>
+                    <input type="password" id="regConfirmPassword" placeholder="Confirm Password" required>
+                    <button type="submit">Register</button>
+                    <p class="switch-msg">Already have an account? <span id="switchToLogin">Login</span></p>
+                </form>
+
+            </div>
+        </div>
+    </section>
+
+    <script src="../js/script.js"></script>
+</body>
+
+</html>
