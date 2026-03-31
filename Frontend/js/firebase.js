@@ -10,7 +10,7 @@ import { getDatabase } from "https://www.gstatic.com/firebasejs/10.12.2/firebase
 
 // 🔑 YOUR FIREBASE CONFIG (from Firebase console)
 const firebaseConfig = {
-    apiKey: "AIzaSyCDrSupju3AvhV3u4wRUzdpGowyJBpeW5Q",
+    apiKey: "AIzaSyACPigoO6zD_cW_tmdbL91j2dWgLaicOds",
     authDomain: "aaranyak-911d6.firebaseapp.com",
     databaseURL: "https://aaranyak-911d6-default-rtdb.firebaseio.com",
     projectId: "aaranyak-911d6",

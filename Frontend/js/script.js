@@ -1,3 +1,32 @@
+// ================= AUTO INIT TICKET DB =================
+if (window.location.pathname.includes("ticket.html")) {
+
+    import("./firebase.js").then(({ db }) => {
+        import("https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js").then(({ ref, get, set }) => {
+
+            const systemRef = ref(db, "ticketSystem");
+
+            get(systemRef).then((snapshot) => {
+
+                // ✅ If NOT exists → create automatically
+                if (!snapshot.exists()) {
+
+                    set(systemRef, {
+                        totalSeats: 100,
+                        onlineLimit: 75,
+                        bookedOnline: 0
+                    });
+
+                    console.log("✅ Ticket system initialized automatically");
+                }
+
+            });
+
+        });
+    });
+
+}
+
 // ====================================ROLE BASED NAVBAR==========================================
 document.addEventListener("DOMContentLoaded", function () {
 
@@ -13,6 +42,7 @@ document.addEventListener("DOMContentLoaded", function () {
             <a href="ticket.html">Online Ticket Booking</a>
             <a href="jeep.html">Jeep Tracker</a>
             <a href="AdminPanel.html">Admin Panel</a>
+
             <button onclick="logout()">Logout</button>
         `;
     }
@@ -254,45 +284,32 @@ function bookTicket() {
         totalAmount
     };
 
-    // Store booking data
+    // ✅ STORE DATA
     localStorage.setItem("bookingData", JSON.stringify(data));
 
-    // Redirect to payment page
+    // ✅ REDIRECT TO PAYMENT
     window.location.href = "payment.html";
 }
 
-//=============================PAYMENT PAGE===============================================
+//==========Ticket booking======================
+// ================= PAYMENT GATEWAY =================
 let selectedMethod = "";
 
-window.onload = function () {
-
-    let data = JSON.parse(localStorage.getItem("bookingData"));
-
-    if (!data) {
-        document.getElementById("details").innerText = "No booking data found!";
-        return;
-    }
-
-    document.getElementById("details").innerHTML = `
-        <p><b>Name:</b> ${data.name}</p>
-        <p><b>Date:</b> ${data.date}</p>
-        <p><b>Time:</b> ${data.time}</p>
-        <p><b>Seats:</b> ${data.seats.join(", ")}</p>
-        <p><b>Total:</b> ₹${data.totalAmount}</p>
-    `;
-};
-
+// select payment method
 function selectMethod(method) {
     selectedMethod = method;
-    alert(method + " selected");
+
+    document.getElementById("selected").innerText =
+        "Selected: " + method;
 }
 
-function payNow() {
+// pay button
+async function payNow() {
 
     let status = document.getElementById("status");
 
     if (!selectedMethod) {
-        status.innerText = "⚠️ Please select a payment method!";
+        status.innerText = "⚠️ Select payment method!";
         status.style.color = "red";
         return;
     }
@@ -300,16 +317,89 @@ function payNow() {
     status.style.color = "yellow";
     status.innerText = "⏳ Processing Payment...";
 
-    // Fake delay
-    setTimeout(() => {
-        status.style.color = "lightgreen";
-        status.innerText = " Payment Successful! \n Ticket Booked";
+    setTimeout(async () => {
 
-        // optional: clear data
-        localStorage.removeItem("bookingData");
+        try {
+
+            status.style.color = "lightgreen";
+            status.innerText = "✅ Payment Successful!";
+
+            let data = JSON.parse(localStorage.getItem("bookingData"));
+
+            if (!data) {
+                status.innerText = "❌ No booking data!";
+                return;
+            }
+
+            const { db } = await import("./firebase.js");
+            const { ref, get, update, push } = await import(
+                "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js"
+            );
+
+            const systemRef = ref(db, "ticketSystem");
+            const snapshot = await get(systemRef);
+
+            if (!snapshot.exists()) {
+                alert("❌ Ticket system not initialized");
+                return;
+            }
+
+            const dbData = snapshot.val();
+
+            let booked = dbData.bookedOnline;
+            let limit = dbData.onlineLimit;
+
+            let seatsRequested = data.seats.length;
+            let remaining = limit - booked;
+
+            if (remaining <= 0) {
+                status.innerText = "❌ Booking full. Try offline.";
+                return;
+            }
+
+            if (seatsRequested > remaining) {
+                status.innerText = `⚠️ Only ${remaining} seats left`;
+                return;
+            }
+
+            if (remaining <= 5) {
+                alert(`🔥 Hurry! Only ${remaining} seats left`);
+            }
+
+            // ✅ UPDATE SEATS
+            await update(systemRef, {
+                bookedOnline: booked + seatsRequested
+            });
+
+            // ✅ SAVE BOOKING
+            await push(ref(db, "confirmedBookings"), {
+                ...data,
+                paymentMethod: selectedMethod,
+                paymentStatus: "SUCCESS",
+                timestamp: Date.now()
+            });
+
+            console.log("✅ SAVED TO FIREBASE");
+
+            localStorage.removeItem("bookingData");
+
+            setTimeout(() => {
+                window.location.href = "Role_Index.html";
+            }, 2000);
+
+        } catch (error) {
+            console.error("🔥 Firebase Error:", error);
+            status.innerText = "❌ Error saving booking!";
+        }
 
     }, 2000);
 }
+
+// 🔥 MAKE FUNCTIONS GLOBAL
+window.logout = logout;
+window.bookTicket = bookTicket;
+window.selectMethod = selectMethod;
+window.payNow = payNow;
 
 function logout() {
     localStorage.removeItem("role");
