@@ -72,6 +72,93 @@ document.addEventListener("DOMContentLoaded", function () {
     if (switchToLogin) switchToLogin.addEventListener('click', showLogin);
 });
 
+// ============================= FIREBASE AUTH (SAFE) =============================
+if (document.getElementById("loginForm") || document.getElementById("registerForm")) {
+
+    import("./firebase.js").then(({ auth, db }) => {
+
+        import("https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js").then((authModule) => {
+            import("https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js").then((dbModule) => {
+
+                const {
+                    createUserWithEmailAndPassword,
+                    signInWithEmailAndPassword
+                } = authModule;
+
+                const { ref, set, get, child } = dbModule;
+
+                // ================= REGISTER =================
+                document.getElementById("registerForm")?.addEventListener("submit", async (e) => {
+                    e.preventDefault();
+
+                    const username = document.getElementById("regUsername").value;
+                    const email = document.getElementById("regEmail").value;
+                    const password = document.getElementById("regPassword").value;
+                    const confirmPassword = document.getElementById("regConfirmPassword").value;
+
+                    if (password !== confirmPassword) {
+                        alert("Passwords do not match!");
+                        return;
+                    }
+
+                    try {
+                        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                        const user = userCredential.user;
+
+                        await set(ref(db, "users/" + user.uid), {
+                            username,
+                            email
+                        });
+
+                        alert("Registration successful!");
+                    } catch (error) {
+                        alert(error.message);
+                    }
+                });
+
+                // ================= LOGIN =================
+                document.getElementById("loginForm")?.addEventListener("submit", async (e) => {
+                    e.preventDefault();
+
+                    const username = document.getElementById("loginUsername").value;
+                    const password = document.getElementById("loginPassword").value;
+
+                    try {
+                        const dbRef = ref(db);
+                        const snapshot = await get(child(dbRef, "users"));
+
+                        let foundUser = null;
+
+                        if (snapshot.exists()) {
+                            snapshot.forEach((childSnap) => {
+                                const data = childSnap.val();
+                                if (data.username === username) {
+                                    foundUser = data;
+                                }
+                            });
+                        }
+
+                        if (!foundUser) {
+                            alert("User not found!");
+                            return;
+                        }
+
+                        await signInWithEmailAndPassword(auth, foundUser.email, password);
+
+                        localStorage.setItem("role", "user");
+                        window.location.href = "Role_Index.html";
+
+                    } catch (error) {
+                        alert("Login failed: " + error.message);
+                    }
+                });
+
+            });
+        });
+
+    });
+
+}
 
 //=============================TICKET BOOKING===============================================
 let selectedSeats = [];
