@@ -165,15 +165,9 @@
 
     <nav>
         <h1>आranyak</h1>
-        <div class="nav-links">
-            <a href="../html/index.html">Home</a>
-            <a href="../html/ticket.html">Online Ticket Booking</a>
-            <a href="../html/map.html">Map of आranyak</a>
-            <a href="../html/safariDetail.html">Safari Details</a>
 
-            <!-- Admin path placeholder -->
-            <a href="#">Admin Panel</a>
-        </div>
+        <!-- KEEP CLASS SAME -->
+        <div class="nav-links" id="navLinks"></div>
     </nav>
 
     <h2>🗺️ Live Species Tracking Map</h2>
@@ -258,6 +252,13 @@
         }
         setInterval(checkFire, 5000);
     </script>
+    <script>
+        if (localStorage.getItem("role") !== "admin") {
+            alert("Admin access only!");
+            window.location.href = "index.html";
+        }
+    </script>
+    <script src="../js/script.js"></script>
 
 </body>
 

@@ -1,3 +1,40 @@
+// ====================================ROLE BASED NAVBAR==========================================
+document.addEventListener("DOMContentLoaded", function () {
+
+    const nav = document.getElementById("navLinks");
+    if (!nav) return;
+
+    const role = localStorage.getItem("role");
+
+    // 👑 ADMIN NAVBAR
+    if (role === "admin") {
+        nav.innerHTML = `
+            <a href="Role_Index.html">Home</a>
+            <a href="ticket.html">Online Ticket Booking</a>
+            <a href="jeep.html">Jeep Tracker</a>
+            <a href="AdminPanel.html">Admin Panel</a>
+            <button onclick="logout()">Logout</button>
+        `;
+    }
+
+    // 👤 USER NAVBAR
+    else if (role === "user") {
+        nav.innerHTML = `
+            <a href="Role_Index.html">Home</a>
+            <a href="map.html">Map</a>
+            <a href="safariDetail.html">Safari Details</a>
+            <a href="ticket.html">Book Ticket</a>
+            <button onclick="logout()">Logout</button>
+        `;
+    }
+
+    // 🌿 NO ROLE → NO NAVBAR
+    else {
+        nav.innerHTML = ``; // 🔥 EMPTY (IMPORTANT)
+    }
+
+});
+
 
 //=============================LOGIN/Register USER===============================================
 document.addEventListener("DOMContentLoaded", function () {
@@ -138,9 +175,9 @@ function bookTicket() {
 }
 
 //=============================PAYMENT PAGE===============================================
-    let selectedMethod = "";
+let selectedMethod = "";
 
-    window.onload = function () {
+window.onload = function () {
 
     let data = JSON.parse(localStorage.getItem("bookingData"));
 
@@ -185,4 +222,9 @@ function payNow() {
         localStorage.removeItem("bookingData");
 
     }, 2000);
+}
+
+function logout() {
+    localStorage.removeItem("role");
+    window.location.href = "index.html";
 }

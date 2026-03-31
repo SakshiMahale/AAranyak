@@ -81,17 +81,8 @@
     <!-- 🌿 NAVBAR -->
     <nav>
         <h1>आranyak</h1>
-
-        <div class="nav-links">
-            <a href="../html/index.html">Home</a>
-            <a href="../html/ticket.html">Online Ticket Booking</a>
-            <a href="../html/map.html">Map of आranyak</a>
-            <a href="../html/safariDetail.html">Safari Details</a>
-            <a href="../html/AdminPanel.html">Admin Panel</a>
-            <!-- Admin path placeholder -->
-        </div>
+        <div class="nav-links" id="navLinks"></div>
     </nav>
-
     <h1>🚙 Safari Jeep Tracker 🌿</h1>
 
     <div class="controls">
@@ -183,6 +174,13 @@
             });
         }
     </script>
+    <script>
+        if (localStorage.getItem("role") !== "admin") {
+            alert("Admin access only!");
+            window.location.href = "index.html";
+        }
+    </script>
+    <script src="../js/script.js"></script>
     <footer>
         <p><b>Project:</b> आranyak Safari Management System</p>
         <p>By: (VJTI) {Vithika Surve, Sakshi Mahale, Bhakti Baraf}, (VESIT){ Vibhuti Sawant} </p>
