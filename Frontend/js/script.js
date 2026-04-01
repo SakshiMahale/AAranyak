@@ -303,6 +303,34 @@ function selectMethod(method) {
         "Selected: " + method;
 }
 
+//UI CONTROL FOR ONLINE TICKET SYSTEM ADMIN
+let role = localStorage.getItem("role");
+
+document.addEventListener("DOMContentLoaded", () => {
+
+    if (window.location.pathname.includes("payment.html")) {
+
+        if (role === "admin") {
+
+            let container = document.querySelector(".payment-options");
+
+            if (container) {
+                container.innerHTML = `
+                    <button onclick="selectMethod('GPay')">GPay</button>
+                    <button onclick="selectMethod('Cash')">Cash</button>
+                `;
+            }
+
+            let title = document.querySelector(".payment-container h2");
+            if (title) {
+                title.innerText = "Admin Payment Panel";
+            }
+        }
+
+    }
+
+});
+
 // pay button
 async function payNow() {
 
@@ -321,8 +349,16 @@ async function payNow() {
 
         try {
 
-            status.style.color = "lightgreen";
-            status.innerText = "✅ Payment Successful!";
+            let role = localStorage.getItem("role");
+
+            // 👑 ADMIN MESSAGE
+            if (role === "admin") {
+                status.style.color = "lightgreen";
+                status.innerText = "✅ Payment Accepted by Admin";
+            } else {
+                status.style.color = "lightgreen";
+                status.innerText = "✅ Payment Successful!";
+            }
 
             let data = JSON.parse(localStorage.getItem("bookingData"));
 
@@ -331,6 +367,7 @@ async function payNow() {
                 return;
             }
 
+            // 🔥 FIREBASE CONNECTION (SAME FOR USER + ADMIN)
             const { db } = await import("./firebase.js");
             const { ref, get, update, push } = await import(
                 "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js"
@@ -352,30 +389,34 @@ async function payNow() {
             let seatsRequested = data.seats.length;
             let remaining = limit - booked;
 
+            // ❌ FULL CHECK
             if (remaining <= 0) {
                 status.innerText = "❌ Booking full. Try offline.";
                 return;
             }
 
+            // ⚠️ LIMITED SEATS
             if (seatsRequested > remaining) {
                 status.innerText = `⚠️ Only ${remaining} seats left`;
                 return;
             }
 
+            // 🔥 LAST FEW ALERT
             if (remaining <= 5) {
                 alert(`🔥 Hurry! Only ${remaining} seats left`);
             }
 
-            // ✅ UPDATE SEATS
+            // ✅ UPDATE SEATS (COMMON FOR ADMIN + USER)
             await update(systemRef, {
                 bookedOnline: booked + seatsRequested
             });
 
-            // ✅ SAVE BOOKING
+            // ✅ SAVE BOOKING (ROLE ADDED 🔥)
             await push(ref(db, "confirmedBookings"), {
                 ...data,
                 paymentMethod: selectedMethod,
                 paymentStatus: "SUCCESS",
+                bookedBy: role, // 👑 ADMIN OR USER
                 timestamp: Date.now()
             });
 
@@ -383,9 +424,16 @@ async function payNow() {
 
             localStorage.removeItem("bookingData");
 
-            setTimeout(() => {
-                window.location.href = "Role_Index.html";
-            }, 2000);
+            // 🔁 REDIRECT BASED ON ROLE
+            if (role === "admin") {
+                setTimeout(() => {
+                    window.location.href = "ticket.html"; // continuous booking
+                }, 2000);
+            } else {
+                setTimeout(() => {
+                    window.location.href = "Role_Index.html";
+                }, 2000);
+            }
 
         } catch (error) {
             console.error("🔥 Firebase Error:", error);
