@@ -147,6 +147,132 @@
                 icon: L.divIcon({ className: 'pulse' })
             }).addTo(map);
         });
+
+
+        // 🛤️ Safari route coordinates
+        const routePoints = [
+
+            // 🔻 ENTRY (bottom left curve)
+
+
+            [296, 820],
+
+            // 🔻 moving right curve
+            [328, 744],
+            [352, 604],
+            [396, 472],
+
+            // 🔻 lake side curve
+            [528, 452],
+            [592, 552],
+            [608, 676],
+
+            // 🔻 center jungle turn
+            [656, 812],
+            [756, 764],
+            [792, 588],
+
+            // 🔻 top curve
+            [864, 436],
+            [864, 300],
+            [948, 220],
+
+            // 🔻 right side descent
+            [1024, 344],
+            [1084, 476],
+            [1144, 612],
+
+            // 🔻 lower right curve
+            [1148, 788],
+            [1144, 968],
+            [1252, 840],
+
+            // 🔻 exit loop bottom
+            [1216, 1128],
+            [1236, 1340],
+            [1192, 1484],
+
+            // 🔻 bottom edge curve
+            [1128, 1636],
+            [1032, 1788],
+            [920, 1700],
+
+            // 🔻 final return to exit
+            [784, 1848],
+            [688, 1740],
+            [600, 1572],
+
+            // 🔻 back to exit gate
+            [472, 1620],
+            [368, 1500],
+            [320, 1228],
+            [256, 1140],
+            [216, 1112]
+
+        ];
+        function getAngle(p1, p2) {
+            const dy = p2[0] - p1[0];
+            const dx = p2[1] - p1[1];
+            return Math.atan2(dy, dx) * (180 / Math.PI);
+        }
+
+        const arrowIndexes = [5, 15, 25];
+
+        arrowIndexes.forEach((i, index) => {
+
+            if (i < routePoints.length - 1) {
+
+                let angle = getAngle(routePoints[i], routePoints[i + 1]);
+
+                // 🎯 FORCE 3rd arrow to point DOWN
+                if (index === 2) {
+                    angle = 90;   // 👈 THIS makes it point downward
+                }
+
+                L.marker(routePoints[i], {
+                    icon: L.divIcon({
+                        className: 'route-arrow',
+                        html: `<div style="
+                    transform: rotate(${angle}deg);
+                    font-size: 26px;
+                    color: #00ffcc;
+                    text-shadow: 0 0 10px #00ffcc;
+                ">➤</div>`,
+                        iconSize: [30, 30]
+                    })
+                }).addTo(map);
+            }
+        });
+
+        const last = routePoints.length - 1;
+
+        L.marker(routePoints[last], {
+            icon: L.divIcon({
+                className: 'route-arrow',
+                html: `<div style="
+            transform: rotate(90deg);   /* 👈 force DOWN */
+            font-size: 28px;
+            color: #00ffcc;
+            text-shadow: 0 0 12px #00ffcc;
+        ">➤</div>`,
+                iconSize: [30, 30]
+            })
+        }).addTo(map);
+
+        // white glow base (visible on dark map)
+        L.polyline(routePoints, {
+            color: '#ffffff',
+            weight: 8,
+            opacity: 0.8
+        }).addTo(map);
+
+        // black dotted line on top
+        L.polyline(routePoints, {
+            color: '#000000',
+            weight: 4,
+            dashArray: '12, 10',
+            opacity: 1
+        }).addTo(map);
     </script>
     <script src="../js/script.js"></script>
 
