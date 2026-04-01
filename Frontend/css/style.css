@@ -784,3 +784,135 @@ body.payment-page {
     font-size: 14px;
     opacity: 0.9;
 }
+
+/*===================Admin Panel.html======================*/
+/* ================= ENHANCED WEATHER UI ================= */
+
+.weather-box.enhanced {
+    width: 90%;
+    max-width: 700px;
+    margin: 40px auto;
+    padding: 25px;
+    border-radius: 15px;
+    background: linear-gradient(145deg, #102510, #061306);
+    border: 1px solid #4CAF50;
+    box-shadow: 0 0 25px rgba(76, 175, 80, 0.3);
+}
+
+.sensor-grid {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.sensor-card {
+    flex: 1;
+    background: #081a08;
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    border: 1px solid #4CAF50;
+    position: relative;
+    transition: 0.3s;
+}
+
+.sensor-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px #4CAF50;
+}
+
+.value {
+    font-size: 32px;
+    font-weight: bold;
+    margin: 10px 0;
+    color: #4CAF50;
+    animation: pulseValue 2s infinite;
+}
+
+.unit {
+    font-size: 14px;
+    opacity: 0.7;
+}
+
+.status-tag {
+    margin-top: 10px;
+    padding: 5px 10px;
+    border-radius: 8px;
+    font-size: 12px;
+    display: inline-block;
+}
+
+/* Status colors */
+.normal {
+    background: #2e7d32;
+}
+
+.warning {
+    background: #ff9800;
+}
+
+.danger {
+    background: #ff3333;
+    box-shadow: 0 0 10px red;
+}
+
+/* Pulse animation */
+@keyframes pulseValue {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.1);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+
+/* ================= FIRE SYSTEM ================= */
+
+.enhanced-fire {
+    text-align: center;
+    padding: 30px;
+}
+
+.fire-box {
+    margin-top: 20px;
+    padding: 20px;
+    border-radius: 12px;
+    font-size: 20px;
+    font-weight: bold;
+    background: #081a08;
+    border: 2px solid #4CAF50;
+    transition: 0.3s;
+}
+
+/* SAFE */
+.fire-safe {
+    color: #4CAF50;
+}
+
+/* ALERT */
+.fire-alert {
+    color: #ff3333;
+    animation: blinkFire 1s infinite;
+    text-shadow: 0 0 15px red;
+}
+
+@keyframes blinkFire {
+    0% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.3;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}

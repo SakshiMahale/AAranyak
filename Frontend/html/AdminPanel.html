@@ -204,26 +204,81 @@
             </table>
         </div>
 
-        <div class="icon predator" style="top: 25%; left: 35%;">T</div>
-        <div class="icon predator" style="top: 45%; left: 65%;">L</div>
+        <!-- 🔥 PREDATORS (Deep forest — NOT near lake edge) -->
+        <div class="icon predator" style="top: 30%; left: 35%;">T</div>
+        <div class="icon predator" style="top: 25%; left: 48%;">L</div>
+        <div class="icon predator" style="top: 42%; left: 40%;">T</div>
+        <div class="icon predator" style="top: 28%; left: 55%;">L</div>
+        <div class="icon predator" style="top: 45%; left: 80%;">T</div>
 
-        <div class="icon herbivore" style="top: 60%; left: 25%;">D</div>
-        <div class="icon herbivore" style="top: 75%; left: 55%;">E</div>
+        <!-- 🌿 HERBIVORES (Trail movement — spread across paths) -->
+        <div class="icon herbivore" style="top: 68%; left: 28%;">D</div>
+        <div class="icon herbivore" style="top: 75%; left: 40%;">E</div>
+        <div class="icon herbivore" style="top: 78%; left: 55%;">D</div>
+        <div class="icon herbivore" style="top: 70%; left: 65%;">E</div>
+        <div class="icon herbivore" style="top: 62%; left: 48%;">D</div>
+        <div class="icon herbivore" style="top: 58%; left: 35%;">E</div>
 
-        <div class="icon bird" style="top: 15%; left: 80%;">P</div>
-        <div class="icon bird" style="top: 20%; left: 15%;">B</div>
+        <!-- 🐦 BIRDS (Edges + canopy — HIGH DENSITY for heatmap feel) -->
+        <div class="icon bird" style="top: 12%; left: 20%;">B</div>
+        <div class="icon bird" style="top: 10%; left: 40%;">P</div>
+        <div class="icon bird" style="top: 15%; left: 60%;">B</div>
+        <div class="icon bird" style="top: 18%; left: 80%;">P</div>
 
-        <div class="icon water" style="top: 65%; left: 85%;">C</div>
+        <div class="icon bird" style="top: 25%; left: 10%;">B</div>
+        <div class="icon bird" style="top: 28%; left: 85%;">P</div>
+
+        <div class="icon bird" style="top: 80%; left: 10%;">B</div>
+        <div class="icon bird" style="top: 85%; left: 25%;">P</div>
+        <div class="icon bird" style="top: 82%; left: 75%;">B</div>
+        <div class="icon bird" style="top: 78%; left: 90%;">P</div>
+
+        <!-- 🌊 WATER (ONLY inside lake — FIXED) -->
+        <div class="icon water" style="top: 52%; left: 62%;">C</div>
+        <div class="icon water" style="top: 55%; left: 68%;">C</div>
+        <div class="icon water" style="top: 58%; left: 64%;">C</div>
+        <div class="icon water" style="top: 50%; left: 70%;">C</div>
+        <div class="icon water" style="top: 54%; left: 66%;">C</div>
     </div>
 
-    <div class="weather-box">
-        <h3>📡 Field Sensor Data</h3>
-        <p>🌡️ Temp: <b id="temp">--</b>°C | 💧 Hum: <b id="humidity">--</b>%</p>
-        <p>🌬️ Wind: <b id="wind">--</b> km/h</p>
+    <div class="weather-box enhanced">
+
+        <h3>📡 Real-Time Environmental Sensors</h3>
+
+        <div class="sensor-grid">
+
+            <div class="sensor-card">
+                <h4>🌡️ Temperature</h4>
+                <div class="value" id="temp">--</div>
+                <span class="unit">°C</span>
+                <div class="status-tag" id="tempStatus">NORMAL</div>
+            </div>
+
+            <div class="sensor-card">
+                <h4>💧 Humidity</h4>
+                <div class="value" id="humidity">--</div>
+                <span class="unit">%</span>
+                <div class="status-tag" id="humidityStatus">NORMAL</div>
+            </div>
+
+            <div class="sensor-card">
+                <h4>🌬️ Wind</h4>
+                <div class="value" id="wind">--</div>
+                <span class="unit">km/h</span>
+                <div class="status-tag" id="windStatus">NORMAL</div>
+            </div>
+
+        </div>
+
     </div>
 
-    <div class="fire-section">
-        <div class="status" id="fireStatus">Status: <span class="no">SAFE</span></div>
+
+    <div class="fire-section enhanced-fire">
+        <h3>🔥 Fire Detection System</h3>
+
+        <div class="fire-box" id="fireStatus">
+            <span class="fire-safe">✔️ NO FIRE DETECTED</span>
+        </div>
     </div>
     <footer>
         <p><b>Project:</b> आranyak Safari Management System</p>

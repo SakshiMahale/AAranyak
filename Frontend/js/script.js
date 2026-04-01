@@ -453,3 +453,60 @@ function logout() {
     localStorage.removeItem("role");
     window.location.href = "index.html";
 }
+
+//Weather on admin panel and fire alerts 
+function updateWeather() {
+
+    let temp = (25 + Math.random() * 10).toFixed(1);
+    let humidity = (60 + Math.random() * 30).toFixed(0);
+    let wind = (2 + Math.random() * 15).toFixed(1);
+
+    document.getElementById("temp").innerText = temp;
+    document.getElementById("humidity").innerText = humidity;
+    document.getElementById("wind").innerText = wind;
+
+    // STATUS LOGIC
+    setStatus("tempStatus", temp, 30, 35);
+    setStatus("humidityStatus", humidity, 75, 85);
+    setStatus("windStatus", wind, 10, 18);
+}
+
+function setStatus(id, value, warn, danger) {
+
+    let el = document.getElementById(id);
+
+    if (value > danger) {
+        el.innerText = "CRITICAL";
+        el.className = "status-tag danger";
+    }
+    else if (value > warn) {
+        el.innerText = "WARNING";
+        el.className = "status-tag warning";
+    }
+    else {
+        el.innerText = "NORMAL";
+        el.className = "status-tag normal";
+    }
+}
+
+setInterval(updateWeather, 3000);
+updateWeather();
+
+
+// 🔥 FIRE DETECTION
+function checkFire() {
+
+    let box = document.getElementById("fireStatus");
+
+    if (Math.random() > 0.85) {
+        box.innerHTML = '<span class="fire-alert">⚠️ FIRE DETECTED!</span>';
+        box.style.border = "2px solid red";
+        box.style.boxShadow = "0 0 25px red";
+    } else {
+        box.innerHTML = '<span class="fire-safe">✔️ NO FIRE DETECTED</span>';
+        box.style.border = "2px solid #4CAF50";
+        box.style.boxShadow = "none";
+    }
+}
+
+setInterval(checkFire, 4000);
