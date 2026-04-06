@@ -63,6 +63,55 @@
             }
         }
 
+        /* 🌿 Glassy Safari Legend */
+        .map-legend {
+            position: absolute;
+            top: 90px;
+            right: 20px;
+            background: linear-gradient(145deg, rgba(0, 60, 0, 0.9), rgba(0, 30, 0, 0.85));
+            border: 1px solid rgba(0, 255, 100, 0.3);
+            color: #eaffea;
+            padding: 14px 18px;
+            border-radius: 14px;
+            font-size: 14px;
+            z-index: 1000;
+            backdrop-filter: blur(8px);
+            box-shadow: 0 0 15px rgba(0, 255, 100, 0.2);
+            min-width: 160px;
+        }
+
+        /* Row style */
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin: 8px 0;
+        }
+
+        /* Colored dot */
+        .legend-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 10px;
+            box-shadow: 0 0 8px currentColor;
+        }
+
+        /* Colors */
+        .blue {
+            background: #2196F3;
+            color: #2196F3;
+        }
+
+        .green {
+            background: #4CAF50;
+            color: #4CAF50;
+        }
+
+        .red {
+            background: #ff3b3b;
+            color: #ff3b3b;
+        }
+
         /* Nav and footer styles */
         nav {
             height: 70px;
@@ -104,6 +153,22 @@
         <div class="nav-links" id="navLinks"></div>
     </nav>
 
+    <div class="map-legend">
+        <div class="legend-item">
+            <span class="legend-dot blue"></span>
+            <span>You</span>
+        </div>
+
+        <div class="legend-item">
+            <span class="legend-dot green"></span>
+            <span>Jeep</span>
+        </div>
+
+        <div class="legend-item">
+            <span class="legend-dot red"></span>
+            <span>Animal</span>
+        </div>
+    </div>
     <div id="map"></div>
 
     <footer>
@@ -118,7 +183,7 @@
 
     <script>
         // 1️⃣ Initialize the map in the div "map"
-        const map = L.map('map', {
+        window.map = L.map('map', {
             crs: L.CRS.Simple, // use simple coordinate system for image
             minZoom: -2
         });
@@ -136,17 +201,17 @@
 
         // 5️⃣ Example animal occurrence markers
         // You need to provide coordinates in image coordinate system [y, x]
-        const animals = [
-            [300, 400],
-            [500, 800],
-            [1000, 1500]
-        ];
+        // const animals = [
+        //     [300, 400],
+        //     [500, 800],
+        //     [1000, 1500]
+        // ];
 
-        animals.forEach(coord => {
-            L.marker(coord, {
-                icon: L.divIcon({ className: 'pulse' })
-            }).addTo(map);
-        });
+        // animals.forEach(coord => {
+        //     L.marker(coord, {
+        //         icon: L.divIcon({ className: 'pulse' })
+        //     }).addTo(map);
+        // });
 
 
         // 🛤️ Safari route coordinates
@@ -274,7 +339,9 @@
             opacity: 1
         }).addTo(map);
     </script>
+
     <script src="../js/script.js"></script>
+    <script type="module" src="../js/map.js"></script>
 
 </body>
 

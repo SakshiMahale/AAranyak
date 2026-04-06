@@ -406,24 +406,6 @@ async function payNow() {
                 alert(`🔥 Hurry! Only ${remaining} seats left`);
             }
 
-            // ✅ UPDATE SEATS (COMMON FOR ADMIN + USER)
-            await update(systemRef, {
-                bookedOnline: booked + seatsRequested
-            });
-
-            // ✅ SAVE BOOKING (ROLE ADDED 🔥)
-            await push(ref(db, "confirmedBookings"), {
-                ...data,
-                paymentMethod: selectedMethod,
-                paymentStatus: "SUCCESS",
-                bookedBy: role, // 👑 ADMIN OR USER
-                timestamp: Date.now()
-            });
-
-            console.log("✅ SAVED TO FIREBASE");
-
-            localStorage.removeItem("bookingData");
-
             // 🔁 REDIRECT BASED ON ROLE
             if (role === "admin") {
                 setTimeout(() => {
@@ -434,6 +416,108 @@ async function payNow() {
                     window.location.href = "Role_Index.html";
                 }, 2000);
             }
+
+            // ================= SAFARI SYSTEM (FINAL SEAT LOGIC - SAFE FOR YOUR DB) =================
+            const safariRef = ref(db, "safariSystem");
+            const safariSnap = await get(safariRef);
+            const safariData = safariSnap.val() || {};
+
+            const usersData = safariData.user || {};
+            const jeepData = safariData.jeep || {};
+
+            const today = data.date; // use booking date (IMPORTANT)
+            const seatsBooked = data.seats.length;
+
+            // ================= 2️⃣ CREATE NEW USER ID =================
+            let userCount = Object.keys(usersData).length;
+            let newUserId = "user" + (userCount + 1);
+
+            // ================= 3️⃣ SAVE USER =================
+            await update(ref(db, "safariSystem/user/" + newUserId), {
+                name: data.name,
+                bookingDate: today,
+                seatsBooked: seatsBooked,
+                location: {
+                    x: 900,
+                    y: 500
+                }
+            });
+
+            console.log("👤 User created:", newUserId, "Seats:", seatsBooked);
+
+            // ================= 4️⃣ JEEP ASSIGNMENT (12 SEATS LOGIC) =================
+            let assignedJeepId = null;
+
+            for (let i = 1; i <= 6; i++) {
+
+                let jeepId = "jeep" + i;
+
+                // 🔄 Always get fresh jeep data
+                let jeepSnap = await get(ref(db, "safariSystem/jeep/" + jeepId));
+                let jeep = jeepSnap.val();
+
+                // 🆕 CREATE JEEP IF NOT EXISTS
+                if (!jeep) {
+
+                    await set(ref(db, "safariSystem/jeep/" + jeepId), {
+                        driver: "Driver " + i,
+                        assignedUserId: newUserId, // keep your existing field
+                        seatCount: seatsBooked,
+                        users: {
+                            [newUserId]: seatsBooked
+                        },
+                        location: {
+                            x: 800,
+                            y: 600
+                        }
+                    });
+
+                    assignedJeepId = jeepId;
+                    console.log("🚙 Created jeep:", jeepId);
+                    break;
+                }
+
+                let currentSeats = jeep.seatCount || 0;
+
+                // ✅ CHECK CAPACITY
+                if (currentSeats + seatsBooked <= 12) {
+
+                    await update(ref(db, "safariSystem/jeep/" + jeepId), {
+                        assignedUserId: newUserId, // keeps compatibility with your map
+                        ["users/" + newUserId]: seatsBooked,
+                        seatCount: currentSeats + seatsBooked
+                    });
+
+                    assignedJeepId = jeepId;
+                    console.log("🚙 Assigned to:", jeepId);
+                    break;
+                }
+            }
+
+            // ================= 5️⃣ ALL JEEPS FULL =================
+            if (!assignedJeepId) {
+                alert("❌ All jeeps are full!");
+                return;
+            }
+
+            // ✅ NOW SAFE TO UPDATE SEATS (ONLY IF JEEP ASSIGNED)
+            await update(systemRef, {
+                bookedOnline: booked + seatsRequested
+            });
+
+            // ✅ SAVE BOOKING
+            await push(ref(db, "confirmedBookings"), {
+                ...data,
+                paymentMethod: selectedMethod,
+                paymentStatus: "SUCCESS",
+                bookedBy: role,
+                timestamp: Date.now()
+            });
+
+            console.log("✅ SAVED TO FIREBASE");
+
+            // ✅ CLEAR STORAGE AFTER SUCCESS
+            localStorage.removeItem("bookingData");
 
         } catch (error) {
             console.error("🔥 Firebase Error:", error);
@@ -510,3 +594,17 @@ function checkFire() {
 }
 
 setInterval(checkFire, 4000);
+
+function showPopup(message) {
+
+    let popup = document.createElement("div");
+    popup.className = "custom-popup";
+    popup.innerHTML = `
+        <div class="popup-box">
+            <p>${message}</p>
+            <button onclick="this.parentElement.parentElement.remove()">OK</button>
+        </div>
+    `;
+
+    document.body.appendChild(popup);
+}
