@@ -42,6 +42,7 @@ document.addEventListener("DOMContentLoaded", function () {
             <a href="ticket.html">Online Ticket Booking</a>
             <a href="jeep.html">Jeep Tracker</a>
             <a href="AdminPanel.html">Admin Panel</a>
+            <a href="history.html">History</a>
 
             <button onclick="logout()">Logout</button>
         `;

@@ -951,7 +951,7 @@ body.payment-page {
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0,0,0,0.6);
+    background: rgba(0, 0, 0, 0.6);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -970,4 +970,90 @@ body.payment-page {
     margin-top: 10px;
     padding: 6px 12px;
     cursor: pointer;
+}
+
+/* Customer History */
+/* ================= HISTORY PAGE ================= */
+
+/* Header */
+.history-header {
+    text-align: center;
+    margin: 40px 0 20px;
+}
+
+.history-header h2 {
+    color: #4CAF50;
+    font-size: 28px;
+}
+
+.history-header p {
+    opacity: 0.7;
+}
+
+/* Filters */
+.history-filters {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.history-filters input {
+    padding: 10px;
+    border-radius: 8px;
+    border: none;
+    background: #061306;
+    color: white;
+}
+
+.history-filters button {
+    width: auto;
+    padding: 10px 20px;
+}
+
+/* Table Section */
+.history-table-section {
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+}
+
+/* Table Styling */
+.history-table {
+    width: 80%;
+    border-collapse: collapse;
+    background: #102510;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 0 20px rgba(76, 175, 80, 0.3);
+}
+
+/* Table Head */
+.history-table thead {
+    background: #4CAF50;
+}
+
+.history-table th {
+    padding: 15px;
+    text-align: center;
+    color: white;
+}
+
+/* Table Rows */
+.history-table td {
+    padding: 12px;
+    text-align: center;
+    border-bottom: 1px solid #1b3d1b;
+}
+
+/* Hover Effect */
+.history-table tbody tr:hover {
+    background: #1b3d1b;
+    transform: scale(1.01);
+    transition: 0.3s;
+}
+
+/* Zebra effect */
+.history-table tbody tr:nth-child(even) {
+    background: #0f2a0f;
 }
