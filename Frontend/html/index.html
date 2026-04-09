@@ -17,7 +17,10 @@
     </div>
 
     <!-- 🔥 NAVBAR WILL BE CREATED DYNAMICALLY -->
-    <div id="navbarContainer"></div>
+    <nav id="navbar" style="display: none;">
+        <div id="navLinks"></div>
+    </nav>
+
 
 
     <!-- 👤 ROLE SELECTION -->
@@ -447,7 +450,7 @@
         <p>Goal: Ensuring wildlife safety and intelligent monitoring.</p>
     </footer>
 
-    <script src="../js/script.js"></script>
+
     <script>
         const role = localStorage.getItem("role");
 
@@ -464,6 +467,8 @@
     <model-viewer src="your-tiger-model.glb" alt="A stunning 3D tiger" auto-rotate camera-controls
         interaction-prompt="none" shadow-intensity="1">
     </model-viewer>
+
+    <script type="module" src="../js/script.js"></script>
 
 
 

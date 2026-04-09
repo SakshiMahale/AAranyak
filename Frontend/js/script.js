@@ -26,8 +26,8 @@ if (window.location.pathname.includes("ticket.html")) {
     });
 
 }
-
 // ====================================ROLE BASED NAVBAR==========================================
+
 document.addEventListener("DOMContentLoaded", function () {
 
     const nav = document.getElementById("navLinks");
@@ -38,16 +38,14 @@ document.addEventListener("DOMContentLoaded", function () {
     // 👑 ADMIN NAVBAR
     if (role === "admin") {
         nav.innerHTML = `
-            <a href="Role_Index.html">Home</a>
-            <a href="ticket.html">Online Ticket Booking</a>
-            <a href="jeep.html">Jeep Tracker</a>
-            <a href="AdminPanel.html">Admin Panel</a>
-            <a href="history.html">History</a>
-
-            <button onclick="logout()">Logout</button>
-        `;
+        <a href="Role_Index.html">Home</a>
+        <a href="ticket.html">Online Ticket Booking</a>
+        <a href="jeep.html">Jeep Tracker</a>
+        <a href="AdminPanel.html">Admin Panel</a>
+        <a href="history.html">History</a>
+        <button onclick="logout()">Logout</button>
+    `;
     }
-
     // 👤 USER NAVBAR
     else if (role === "user") {
         nav.innerHTML = `
@@ -65,7 +63,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 });
-
 
 //=============================LOGIN/Register USER===============================================
 document.addEventListener("DOMContentLoaded", function () {
@@ -154,6 +151,13 @@ if (document.getElementById("loginForm") || document.getElementById("registerFor
                     const username = document.getElementById("loginUsername").value;
                     const password = document.getElementById("loginPassword").value;
 
+                    // 👑 ADMIN LOGIN (HARDCODED)
+                    if (username === "admin" && password === "admin123") {
+                        localStorage.setItem("role", "admin");
+                        window.location.href = "Role_Index.html";
+                        return;
+                    }
+
                     try {
                         const dbRef = ref(db);
                         const snapshot = await get(child(dbRef, "users"));
@@ -176,7 +180,9 @@ if (document.getElementById("loginForm") || document.getElementById("registerFor
 
                         await signInWithEmailAndPassword(auth, foundUser.email, password);
 
+                        // 👤 USER LOGIN
                         localStorage.setItem("role", "user");
+
                         window.location.href = "Role_Index.html";
 
                     } catch (error) {
