@@ -356,16 +356,26 @@ async function payNow() {
 
         try {
 
-            let role = localStorage.getItem("role");
+            const { db, auth } = await import("./firebase.js");
 
-            // 👑 ADMIN MESSAGE
-            if (role === "admin") {
-                status.style.color = "lightgreen";
-                status.innerText = "✅ Payment Accepted by Admin";
-            } else {
-                status.style.color = "lightgreen";
-                status.innerText = "✅ Payment Successful!";
+            const {
+                ref,
+                get,
+                update,
+                push,
+                set
+            } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js");
+
+            const currentUser = auth.currentUser;
+
+            if (!currentUser) {
+                alert("❌ User not logged in");
+                return;
             }
+
+            const uid = currentUser.uid;
+
+            let role = localStorage.getItem("role");
 
             let data = JSON.parse(localStorage.getItem("bookingData"));
 
@@ -374,12 +384,9 @@ async function payNow() {
                 return;
             }
 
-            // 🔥 FIREBASE CONNECTION (SAME FOR USER + ADMIN)
-            const { db } = await import("./firebase.js");
-            const { ref, get, update, push } = await import(
-                "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js"
-            );
+            let seatsRequested = data.seats.length;
 
+            // ================= TICKET SYSTEM =================
             const systemRef = ref(db, "ticketSystem");
             const snapshot = await get(systemRef);
 
@@ -393,85 +400,51 @@ async function payNow() {
             let booked = dbData.bookedOnline;
             let limit = dbData.onlineLimit;
 
-            let seatsRequested = data.seats.length;
             let remaining = limit - booked;
 
-            // ❌ FULL CHECK
             if (remaining <= 0) {
-                status.innerText = "❌ Booking full. Try offline.";
+                status.innerText = "❌ Booking full.";
                 return;
             }
 
-            // ⚠️ LIMITED SEATS
             if (seatsRequested > remaining) {
                 status.innerText = `⚠️ Only ${remaining} seats left`;
                 return;
             }
 
-            // 🔥 LAST FEW ALERT
-            if (remaining <= 5) {
-                alert(`🔥 Hurry! Only ${remaining} seats left`);
-            }
-
-            // 🔁 REDIRECT BASED ON ROLE
-            if (role === "admin") {
-                setTimeout(() => {
-                    window.location.href = "ticket.html"; // continuous booking
-                }, 2000);
-            } else {
-                setTimeout(() => {
-                    window.location.href = "Role_Index.html";
-                }, 2000);
-            }
-
-            // ================= SAFARI SYSTEM (FINAL SEAT LOGIC - SAFE FOR YOUR DB) =================
-            const safariRef = ref(db, "safariSystem");
-            const safariSnap = await get(safariRef);
-            const safariData = safariSnap.val() || {};
-
-            const usersData = safariData.user || {};
-            const jeepData = safariData.jeep || {};
-
-            const today = data.date; // use booking date (IMPORTANT)
-            const seatsBooked = data.seats.length;
-
-            // ================= 2️⃣ CREATE NEW USER ID =================
-            let userCount = Object.keys(usersData).length;
-            let newUserId = "user" + (userCount + 1);
-
-            // ================= 3️⃣ SAVE USER =================
-            await update(ref(db, "safariSystem/user/" + newUserId), {
+            // ================= SAVE USER =================
+            await set(ref(db, "safariSystem/user/" + uid), {
                 name: data.name,
-                bookingDate: today,
-                seatsBooked: seatsBooked,
+                bookingDate: data.date,
+                seatsBooked: seatsRequested,
                 location: {
                     x: 900,
                     y: 500
                 }
             });
 
-            console.log("👤 User created:", newUserId, "Seats:", seatsBooked);
+            console.log("👤 User saved:", uid);
 
-            // ================= 4️⃣ JEEP ASSIGNMENT (12 SEATS LOGIC) =================
+            // ================= JEEP ASSIGN =================
             let assignedJeepId = null;
 
             for (let i = 1; i <= 6; i++) {
 
                 let jeepId = "jeep" + i;
 
-                // 🔄 Always get fresh jeep data
-                let jeepSnap = await get(ref(db, "safariSystem/jeep/" + jeepId));
+                let jeepRef = ref(db, "safariSystem/jeep/" + jeepId);
+                let jeepSnap = await get(jeepRef);
                 let jeep = jeepSnap.val();
 
-                // 🆕 CREATE JEEP IF NOT EXISTS
+                // CREATE JEEP
                 if (!jeep) {
 
-                    await set(ref(db, "safariSystem/jeep/" + jeepId), {
+                    await set(jeepRef, {
                         driver: "Driver " + i,
-                        assignedUserId: newUserId, // keep your existing field
-                        seatCount: seatsBooked,
+                        assignedUserId: uid,
+                        seatCount: seatsRequested,
                         users: {
-                            [newUserId]: seatsBooked
+                            [uid]: seatsRequested
                         },
                         location: {
                             x: 800,
@@ -480,58 +453,65 @@ async function payNow() {
                     });
 
                     assignedJeepId = jeepId;
-                    console.log("🚙 Created jeep:", jeepId);
                     break;
                 }
 
                 let currentSeats = jeep.seatCount || 0;
 
-                // ✅ CHECK CAPACITY
-                if (currentSeats + seatsBooked <= 12) {
+                if (currentSeats + seatsRequested <= 12) {
 
-                    await update(ref(db, "safariSystem/jeep/" + jeepId), {
-                        assignedUserId: newUserId, // keeps compatibility with your map
-                        ["users/" + newUserId]: seatsBooked,
-                        seatCount: currentSeats + seatsBooked
+                    await update(jeepRef, {
+                        assignedUserId: uid,
+                        ["users/" + uid]: seatsRequested,
+                        seatCount: currentSeats + seatsRequested
                     });
 
                     assignedJeepId = jeepId;
-                    console.log("🚙 Assigned to:", jeepId);
                     break;
                 }
             }
 
-            // ================= 5️⃣ ALL JEEPS FULL =================
             if (!assignedJeepId) {
-                alert("❌ All jeeps are full!");
+                alert("❌ All jeeps full");
                 return;
             }
 
-            // ✅ NOW SAFE TO UPDATE SEATS (ONLY IF JEEP ASSIGNED)
+            console.log("🚙 Assigned Jeep:", assignedJeepId);
+
+            // ================= UPDATE SEATS =================
             await update(systemRef, {
                 bookedOnline: booked + seatsRequested
             });
 
-            // ✅ SAVE BOOKING
+            // ================= SAVE BOOKING =================
             await push(ref(db, "confirmedBookings"), {
                 ...data,
+                userId: uid,
+                jeepId: assignedJeepId,
                 paymentMethod: selectedMethod,
                 paymentStatus: "SUCCESS",
                 bookedBy: role,
                 timestamp: Date.now()
             });
 
-            console.log("✅ SAVED TO FIREBASE");
+            console.log("✅ Booking saved");
 
-            // ✅ CLEAR STORAGE AFTER SUCCESS
+            // ================= UI =================
+            status.style.color = "lightgreen";
+            status.innerText = "✅ Payment Successful!";
+
             localStorage.removeItem("bookingData");
 
+            setTimeout(() => {
+                window.location.href = "Role_Index.html";
+            }, 2000);
+
         } catch (error) {
-            console.error("🔥 Firebase Error:", error);
-            status.innerText = "❌ Error saving booking!";
+            console.error("🔥 ERROR:", error);
+            status.innerText = "❌ Booking failed!";
         }
 
-    }, 2000);
+    }, 1500);
 }
 
 // 🔥 MAKE FUNCTIONS GLOBAL

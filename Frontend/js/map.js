@@ -1,6 +1,7 @@
 import { db } from "./firebase.js";
 import { auth } from "./firebase.js";
 import { ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 // 🎯 ICONS
 const userIcon = new L.Icon({
@@ -34,7 +35,12 @@ window.addEventListener("load", () => {
         return Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
     }
 
-    onValue(ref(db, "safariSystem"), (snapshot) => {
+
+    onAuthStateChanged(auth, (currentUser) => {
+
+        if (!currentUser) return;
+
+        onValue(ref(db, "safariSystem"), (snapshot) => {
 
         const data = snapshot.val();
         if (!data) return;
@@ -52,7 +58,8 @@ window.addEventListener("load", () => {
         const users = data.user || {};
 
         // ⚠️ since you are NOT using UID mapping
-        const user = users["user1"]; // manually picking user
+        // const user = users["user1"]; // manually picking user
+        const user = users[currentUser.uid];
 
         // ================= USER =================
         if (user) {
@@ -71,7 +78,10 @@ window.addEventListener("load", () => {
         let assignedJeep = null;
 
         for (let id in jeeps) {
-            assignedJeep = jeeps[id]; // only one jeep anyway
+            if (jeeps[id].users && jeeps[id].users[currentUser.uid]) {
+                assignedJeep = jeeps[id];
+                break;
+            }
         }
 
         if (assignedJeep) {
@@ -130,6 +140,10 @@ window.addEventListener("load", () => {
         }
 
     });
+
+    });
+
+    
 
 });
 
