@@ -539,26 +539,44 @@ function logout() {
     window.location.href = "index.html";
 }
 
-//Weather on admin panel and fire alerts 
-function updateWeather() {
+import { db } from "./firebase.js";
+import { ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-    let temp = (25 + Math.random() * 10).toFixed(1);
-    let humidity = (60 + Math.random() * 30).toFixed(0);
-    let wind = (2 + Math.random() * 15).toFixed(1);
+const sensorRef = ref(db, "sensor");
 
+onValue(sensorRef, (snapshot) => {
+
+    const data = snapshot.val();
+
+    if (!data) {
+        console.log("No sensor data found!");
+        return;
+    }
+
+    console.log("🔥 SENSOR DATA:", data); // DEBUG
+
+    const temp = data.temp || 0;
+    const humidity = data.humidity || 0;
+    const gas = data.gas || 0;
+    const motion = data.motion || 0;
+
+    // ✅ Update UI
     document.getElementById("temp").innerText = temp;
     document.getElementById("humidity").innerText = humidity;
-    document.getElementById("wind").innerText = wind;
+    document.getElementById("wind").innerText = gas;
 
-    // STATUS LOGIC
-    setStatus("tempStatus", temp, 30, 35);
-    setStatus("humidityStatus", humidity, 75, 85);
-    setStatus("windStatus", wind, 10, 18);
-}
+    // ✅ Status
+    updateStatus("tempStatus", temp, 30, 40);
+    updateStatus("humidityStatus", humidity, 70, 85);
+    updateStatus("windStatus", gas, 2000, 3000);
 
-function setStatus(id, value, warn, danger) {
+    // 🔥 Fire
+    detectFire(temp, gas, motion);
+});
 
-    let el = document.getElementById(id);
+function updateStatus(id, value, warn, danger) {
+
+    const el = document.getElementById(id);
 
     if (value > danger) {
         el.innerText = "CRITICAL";
@@ -574,27 +592,28 @@ function setStatus(id, value, warn, danger) {
     }
 }
 
-setInterval(updateWeather, 3000);
-updateWeather();
+function detectFire(temp, gas, motion) {
 
+    let fire = false;
 
-// 🔥 FIRE DETECTION
-function checkFire() {
+    if (
+        temp > 45 ||
+        gas > 2500 ||
+        (gas > 2000 && motion == 1)
+    ) {
+        fire = true;
+    }
 
-    let box = document.getElementById("fireStatus");
+    const fireElement = document.getElementById("fireStatus");
 
-    if (Math.random() > 0.85) {
-        box.innerHTML = '<span class="fire-alert">⚠️ FIRE DETECTED!</span>';
-        box.style.border = "2px solid red";
-        box.style.boxShadow = "0 0 25px red";
+    if (fire) {
+        fireElement.innerHTML = "🔥 FIRE DETECTED!";
+        fireElement.style.color = "red";
     } else {
-        box.innerHTML = '<span class="fire-safe">✔️ NO FIRE DETECTED</span>';
-        box.style.border = "2px solid #4CAF50";
-        box.style.boxShadow = "none";
+        fireElement.innerHTML = "✔️ NO FIRE DETECTED";
+        fireElement.style.color = "#4CAF50";
     }
 }
-
-setInterval(checkFire, 4000);
 
 function showPopup(message) {
 
