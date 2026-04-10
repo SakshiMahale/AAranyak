@@ -65,6 +65,128 @@
         .card li {
             margin: 10px 0;
         }
+
+        .card p {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #d1fae5;
+        }
+
+        .rules h2 {
+            color: #4CAF50;
+            margin-bottom: 20px;
+        }
+
+        /* Glow hover effect */
+        .card:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 0 25px #4CAF50;
+        }
+
+        /* 🌈 Spectrum Cards */
+        .spectrum-card {
+            position: relative;
+            overflow: hidden;
+            background: #102510;
+            border-radius: 15px;
+            padding: 20px;
+            transition: 0.4s;
+        }
+
+        .spectrum-card::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(120deg, #22c55e, #4CAF50, #00ffcc, #22c55e);
+            opacity: 0;
+            transition: 0.4s;
+            z-index: 0;
+        }
+
+        .spectrum-card:hover::before {
+            opacity: 0.2;
+        }
+
+        .spectrum-card * {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ✨ Section separation */
+        .section-title {
+            text-align: center;
+            color: #4CAF50;
+            margin-bottom: 25px;
+        }
+
+        /* 📍 Reach Section special styling */
+        .reach-section {
+            background: #081c08;
+            padding: 40px;
+        }
+
+        /* ✨ Bigger cards for Visit Us */
+        .visit-card {
+            width: 260px;
+        }
+
+        /* 🌿 subtle glow */
+        .spectrum-card:hover {
+            transform: translateY(-6px) scale(1.05);
+            box-shadow: 0 0 25px #22c55e;
+        }
+
+        /* 🌈 Image-based Spectrum Cards */
+        .image-card {
+            position: relative;
+            width: 260px;
+            height: 180px;
+            border-radius: 15px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: 0.4s;
+        }
+
+        /* Background image */
+        .image-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: brightness(0.6);
+            transition: 0.4s;
+        }
+
+        /* Text overlay */
+        .image-card .overlay {
+            position: absolute;
+            bottom: 0;
+            padding: 15px;
+            color: white;
+        }
+
+        /* Hover effect */
+        .image-card:hover img {
+            transform: scale(1.1);
+            filter: brightness(0.8);
+        }
+
+        .image-card:hover {
+            box-shadow: 0 0 25px #22c55e;
+            transform: translateY(-5px);
+        }
+
+        /* Section title */
+        .section-title {
+            text-align: center;
+            color: #4CAF50;
+            margin-bottom: 20px;
+        }
+
+        /* Separate reach section */
+        .reach-section {
+            padding: 40px;
+            background: #081c08;
+        }
     </style>
 </head>
 
@@ -88,11 +210,94 @@
         <h2>🌿 Jungle Safari Experience</h2>
 
         <p>
-            Experience a thrilling <b>2-hour safari</b> through dense forests of आranyak.
+            Experience a thrilling <b>3-hour safari</b> through dense forests of आranyak.
             Witness majestic wildlife including tigers, deer, eagles, and exotic birds
             in their natural habitat.
         </p>
     </section>
+
+    <section class="reach-section">
+
+        <h2 class="section-title">📍 How to Reach Us</h2>
+
+        <!-- ✅ Separate Location -->
+        <p style="text-align:center; margin-bottom:30px;">
+            📍 <b>Aaranyak, Nalasopara, Mumbai</b>
+        </p>
+
+        <div class="rules-container">
+
+            <div class="card">
+                <h3>🚆 By Train</h3>
+                <p>
+                    Get down at <b>Nalasopara Station</b><br>
+                    🚖 Auto: 4 km (~10 mins)
+                </p>
+            </div>
+
+            <div class="card">
+                <h3>✈️ By Flight</h3>
+                <p>
+                    Andheri Sahara Airport<br>
+                    🚗 Distance: 40 km<br>
+                    ⏱️ ~1–1.5 hrs
+                </p>
+            </div>
+
+            <div class="card">
+                <h3>🚕 Direct Travel</h3>
+                <p>
+                    Search: Aaranyak Safari<br>
+                    🧭 Easy navigation available
+                </p>
+            </div>
+
+        </div>
+
+    </section>
+
+    <section class="rules">
+
+        <h2 class="section-title">🌿 Visit Us For!</h2>
+
+        <div class="rules-container">
+
+            <div class="image-card">
+                <img src="../assets/safari.jpeg">
+                <div class="overlay">
+                    <h3>📸 Selfie Point</h3>
+                    <p>Eco-themed jungle photos</p>
+                </div>
+            </div>
+
+            <div class="image-card">
+                <img src="../assets/campingactivity.jpg">
+                <div class="overlay">
+                    <h3>🧗 Adventure</h3>
+                    <p>Climbing & obstacle fun</p>
+                </div>
+            </div>
+
+            <div class="image-card">
+                <img src="../assets/snakeactivity">
+                <div class="overlay">
+                    <h3>🐍 Animal Interaction</h3>
+                    <p>Snakes & eagles 🦅</p>
+                </div>
+            </div>
+
+            <div class="image-card">
+                <img src="../assets/activityjeep">
+                <div class="overlay">
+                    <h3>🌿 Awareness</h3>
+                    <p>Learn conservation</p>
+                </div>
+            </div>
+
+        </div>
+
+    </section>
+
 
     <!-- ⚠️ DOs & DON'Ts -->
     <section class="rules">
@@ -124,6 +329,7 @@
         </div>
 
     </section>
+
 
 
 
