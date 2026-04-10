@@ -340,6 +340,31 @@ document.addEventListener("DOMContentLoaded", () => {
 
 });
 
+function getSlotTimings(slot) {
+
+    const today = new Date();
+
+    let start, end;
+
+    if (slot === "6-9") {
+        start = new Date(today.setHours(6, 0, 0, 0));
+        end = new Date(today.setHours(9, 0, 0, 0));
+    }
+    else if (slot === "10-1") {
+        start = new Date(today.setHours(10, 0, 0, 0));
+        end = new Date(today.setHours(13, 0, 0, 0));
+    }
+    else if (slot === "3-6") {
+        start = new Date(today.setHours(15, 0, 0, 0));
+        end = new Date(today.setHours(18, 0, 0, 0));
+    }
+
+    return {
+        startTime: start.getTime(),
+        endTime: end.getTime()
+    };
+}
+
 // pay button
 async function payNow() {
 
@@ -415,11 +440,19 @@ async function payNow() {
             }
 
             // ================= SAVE USER =================
-            await set(ref(db, "safariSystem/user/" + uid), {
-                name: data.name,
-                bookingDate: data.date,
-                seatsBooked: seatsRequested,
-            });
+            const slotData = getSlotTimings(data.time);
+
+            // calculate jeep start time (15 min delay)
+            let jeepIndexUsed = 0;
+
+            // await set(ref(db, "safariSystem/user/" + uid), {
+            //     name: data.name,
+            //     bookingDate: data.date,
+            //     seatsBooked: seatsRequested,
+            //     slot: data.time,
+            //     startTime: jeepStartTime,
+            //     endTime: slotData.endTime
+            // });
 
             console.log("👤 User saved:", uid);
 
@@ -434,41 +467,71 @@ async function payNow() {
                 let jeepSnap = await get(jeepRef);
                 let jeep = jeepSnap.val();
 
-                // CREATE JEEP
-                if (!jeep) {
+                let currentSeats = jeep?.seatCount || 0;
 
-                    await set(jeepRef, {
-                        driver: "Driver " + i,
-                        assignedUserId: uid,
-                        seatCount: seatsRequested,
-                        users: {
-                            [uid]: seatsRequested
-                        },
-                        location: {
-                            x: 800,
-                            y: 600
-                        }
-                    });
+                if (!jeep || currentSeats + seatsRequested <= 12) {
 
-                    assignedJeepId = jeepId;
-                    break;
-                }
+                    // ✅ Calculate staggered time (15 min gap)
+                    const jeepStartTime = slotData.startTime + ((i - 1) * 15 * 60 * 1000);
 
-                let currentSeats = jeep.seatCount || 0;
+                    // // ✅ SAVE USER (ONLY HERE)
+                    // await set(ref(db, "safariSystem/user/" + uid), {
+                    //     name: data.name,
+                    //     bookingDate: data.date,
+                    //     seatsBooked: seatsRequested,
+                    //     slot: data.time,
+                    //     startTime: jeepStartTime,
+                    //     endTime: slotData.endTime,
+                    //     jeepId: jeepId
+                    // });
 
-                if (currentSeats + seatsRequested <= 12) {
+                    // ✅ CREATE or UPDATE JEEP
+                    if (!jeep) {
+                        await set(jeepRef, {
+                            driver: "Driver " + i,
+                            seatCount: seatsRequested,
+                            users: {
+                                [uid]: seatsRequested
+                            },
+                            startTime: jeepStartTime,
+                            endTime: slotData.endTime,
+                            location: { x: 800, y: 600 }
+                        });
+                    } else {
+                        let updatedUsers = jeep.users || {};
+                        updatedUsers[uid] = seatsRequested;
 
-                    await update(jeepRef, {
-                        assignedUserId: uid,
-                        ["users/" + uid]: seatsRequested,
-                        seatCount: currentSeats + seatsRequested
-                    });
+                        await update(jeepRef, {
+                            [`users/${uid}`]: (jeep?.users?.[uid] || 0) + seatsRequested,
+                            seatCount: currentSeats + seatsRequested
+                        });
+                    }
 
                     assignedJeepId = jeepId;
                     break;
                 }
             }
 
+            // ✅ SAVE USER AFTER JEEP ASSIGNED
+            const userRef = ref(db, "safariSystem/user/" + uid);
+            const existingUserSnap = await get(userRef);
+
+            let newSeatCount = seatsRequested;
+
+            if (existingUserSnap.exists()) {
+                const oldData = existingUserSnap.val();
+                newSeatCount += oldData.seatsBooked || 0;
+            }
+
+            await set(userRef, {
+                name: data.name,
+                bookingDate: data.date,
+                seatsBooked: newSeatCount, // ✅ accumulated
+                slot: data.time,
+                startTime: slotData.startTime,
+                endTime: slotData.endTime,
+                jeepId: assignedJeepId
+            });
             if (!assignedJeepId) {
                 alert("❌ All jeeps full");
                 return;
@@ -503,6 +566,50 @@ async function payNow() {
             setTimeout(() => {
                 window.location.href = "Role_Index.html";
             }, 2000);
+
+            const delay = slotData.endTime - Date.now();
+
+            if (delay > 0) {
+
+                setTimeout(async () => {
+
+                    try {
+
+                        const historyRef = ref(db, "history/" + uid);
+                        const userRef = ref(db, "safariSystem/user/" + uid);
+
+                        const userSnap = await get(userRef);
+
+                        if (userSnap.exists()) {
+
+                            const userData = userSnap.val();
+
+                            // ✅ MOVE TO HISTORY
+                            await set(historyRef, {
+                                ...userData,
+                                completedAt: Date.now()
+                            });
+
+                            // ✅ REMOVE USER
+                            await set(userRef, null);
+
+                            // ✅ REMOVE FROM ONLY ASSIGNED JEEP
+                            const jeepId = userData.jeepId;
+
+                            await set(ref(db, `safariSystem/jeep/${jeepId}/users/${uid}`), null);
+
+                            console.log("📦 Moved to history AFTER slot end");
+                        }
+
+                    } catch (err) {
+                        console.error("History move error:", err);
+                    }
+
+                }, delay);
+
+            } else {
+                console.log("⚠️ Slot already expired → not scheduling history move");
+            }
 
         } catch (error) {
             console.error("🔥 ERROR:", error);
