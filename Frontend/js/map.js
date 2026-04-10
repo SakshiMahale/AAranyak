@@ -26,7 +26,6 @@ window.addEventListener("load", () => {
         return;
     }
 
-    let userMarker = null;
     let jeepMarker = null;
     let animalMarkers = {};
     let alertShown = {}; // prevent repeated alerts
@@ -55,24 +54,7 @@ window.addEventListener("load", () => {
         // ✅ FIXED DATA PATHS
         const animals = data.animals || {};
         const jeeps = data.jeep || {};
-        const users = data.user || {};
-
-        // ⚠️ since you are NOT using UID mapping
-        // const user = users["user1"]; // manually picking user
-        const user = users[currentUser.uid];
-
-        // ================= USER =================
-        if (user) {
-            const coord = [user.location.y, user.location.x];
-
-            if (!userMarker) {
-                userMarker = L.marker(coord, { icon: userIcon })
-                    .addTo(map)
-                    .bindPopup("👤 You");
-            } else {
-                userMarker.setLatLng(coord);
-            }
-        }
+        
 
         // ================= JEEP =================
         let assignedJeep = null;
@@ -122,17 +104,18 @@ window.addEventListener("load", () => {
                 animalMarkers[id].setLatLng(coord);
             }
 
-            // ================= ALERT =================
-            if (user && !alertShown[id]) {
+            // ================= ALERT (BASED ON JEEP) =================
+            if (assignedJeep && !alertShown[id]) {
 
                 let distance = getDistance(
-                    user.location.x,
-                    user.location.y,
+                    assignedJeep.location.x,
+                    assignedJeep.location.y,
                     animal.location.x,
                     animal.location.y
                 );
 
-                if (distance < 120) {
+                // You can tune this value
+                if (distance < 150) {
                     alertShown[id] = true;
                     showAnimalAlert(animal.type, coord, id);
                 }

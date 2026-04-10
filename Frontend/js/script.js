@@ -417,10 +417,6 @@ async function payNow() {
                 name: data.name,
                 bookingDate: data.date,
                 seatsBooked: seatsRequested,
-                location: {
-                    x: 900,
-                    y: 500
-                }
             });
 
             console.log("👤 User saved:", uid);
