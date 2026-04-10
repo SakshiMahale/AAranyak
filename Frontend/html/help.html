@@ -1,23 +1,36 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-    <title>Aaranyak Help</title>
-    <link rel="stylesheet" href="../css/help.css">
+    <title>आranyak Help</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="icon" type="image/x-icon" href="../assets/vine.png">
+
 </head>
+
 <body>
 
-<div class="chat-box">
-    <h2>🌿 Aaranyak Help Assistant</h2>
+    <nav>
+        <h1>आranyak</h1>
 
-    <div id="messages"></div>
+        <!-- KEEP CLASS SAME -->
+        <div class="nav-links" id="navLinks"></div>
+    </nav>
 
-    <div class="input-area">
-        <input type="text" id="input" placeholder="Ask anything..." />
-        <button onclick="sendMessage()">Send</button>
+    <div class="chat-box">
+        <h2>🌿 आranyak Help Assistant</h2>
+
+        <div id="messages"></div>
+
+        <div class="input-area">
+            <input type="text" id="input" placeholder="Ask anything..." />
+            <button id="button1" onclick="sendMessage()">Send</button>
+        </div>
     </div>
-</div>
 
-<script src="../js/help.js"></script>
+    <script src="../js/help.js"></script>
+    <script type="module" src="../js/script.js"></script>
 
 </body>
+
 </html>

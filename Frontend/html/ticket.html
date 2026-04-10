@@ -27,7 +27,12 @@
 
         <!-- Date & Time -->
         <input type="date" id="date">
-        <input type="time" id="time">
+        <select id="time">
+            <option value="">Select Time Slot</option>
+            <option value="6-9"> 6 AM – 9 AM (Morning Safari)</option>
+            <option value="10-1"> 10 AM – 1 PM (Midday Safari)</option>
+            <option value="3-6"> 3 PM – 6 PM (Evening Safari)</option>
+        </select>
 
         <!-- Seats -->
         <h3>Select Seats</h3>
@@ -53,6 +58,12 @@
         <p id="warning"></p>
 
     </div>
+
+    <div id="vetPopup" class="vet-popup">
+        🐾 Animal Welfare Vet <br>
+        📞 +91 88795 XXXXX
+    </div>
+
     <footer>
         <p><b>Project:</b> आranyak Safari Management System</p>
         <p>By: (VJTI) {Vithika Surve, Sakshi Mahale, Bhakti Baraf}, (VESIT){ Vibhuti Sawant} </p>

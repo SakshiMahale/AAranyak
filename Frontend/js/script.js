@@ -53,6 +53,8 @@ document.addEventListener("DOMContentLoaded", function () {
             <a href="map.html">Map</a>
             <a href="safariDetail.html">Safari Details</a>
             <a href="ticket.html">Book Ticket</a>
+            <a href="help.html">Help & Support</a>
+            <a href="animalStats.html">AnimalStats</a>
             <button onclick="logout()">Logout</button>
         `;
     }
@@ -597,6 +599,8 @@ function detectFire(temp, gas, motion) {
     }
 }
 
+// PHONE NUMBER POPUP VET 
+
 function showPopup(message) {
 
     let popup = document.createElement("div");
@@ -610,3 +614,15 @@ function showPopup(message) {
 
     document.body.appendChild(popup);
 }
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const role = localStorage.getItem("role");
+    const popup = document.getElementById("vetPopup");
+
+    if (popup && role === "admin") {
+        popup.style.display = "block";
+    }
+
+});
+
