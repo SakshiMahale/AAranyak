@@ -6,16 +6,87 @@
     <link rel="stylesheet" href="../css/style.css">
     <link rel="icon" type="image/x-icon" href="../assets/vine.png">
     <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
-</head>
 
+    <!-- Firebase loaded via ES module in the script below -->
+
+    <style>
+        /* ── Admin controls styling ── */
+        .admin-controls {
+            display: none;
+            /* hidden by default, shown for admin via JS */
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 6px;
+        }
+
+        .admin-controls button {
+            background: #2d6a2d;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: 4px 10px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            /* ✅ Full fix: no blue highlight, no focus ring, no text selection */
+            outline: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .admin-controls button:hover {
+            background: #1a4a1a;
+        }
+
+        .admin-controls button:active {
+            background: #0f2e0f;
+            transform: scale(0.96);
+        }
+
+        .admin-controls button:focus,
+        .admin-controls button:focus-visible {
+            outline: none;
+            box-shadow: none;
+        }
+
+        /* Stop image/card from getting selected on double-click */
+        .animal-card img {
+            -webkit-user-select: none;
+            user-select: none;
+            pointer-events: none;
+        }
+
+        .animal-card {
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        /* Count span highlight */
+        .animal-count {
+            font-weight: bold;
+            font-size: 1.1em;
+            color: #2d6a2d;
+        }
+
+        /* "Saving…" / "Saved ✓" indicator */
+        .save-status {
+            font-size: 0.7em;
+            color: #888;
+            margin-left: 4px;
+            transition: opacity 0.4s;
+        }
+    </style>
+</head>
 
 <body>
 
     <!-- 🌿 NAVBAR -->
     <nav>
         <h1>आranyak</h1>
-
-        <!-- KEEP CLASS SAME -->
         <div class="nav-links" id="navLinks"></div>
     </nav>
 
@@ -29,424 +100,578 @@
     </section>
 
     <!-- 🐾 ANIMAL SECTION -->
+    <!-- 
+        DATA FORMAT for each card:
+          data-animal="key"       → unique Firebase key (no spaces)
+          data-default="N"        → fallback count if Firebase is empty
+        Count span always has id="{key}-count"
+        Admin controls always have class="admin-controls admin-only"
+    -->
     <section class="animals">
 
         <!-- 🐅 TIGER -->
-        <div class="animal-card">
-            <img src="../assets/tiger.jpg" class="rotate">
-            </model-viewer>
-
+        <div class="animal-card" data-animal="tiger" data-default="5">
+            <img src="../assets/tiger.jpg" class="rotate" alt="Tiger">
             <h3>Tiger 🐅</h3>
-            <p>5 Tigers, each with 3 cubs</p>
+            <p>
+                Count: <span id="tiger-count" class="animal-count">5</span>
+                <span class="save-status" id="tiger-status"></span><br>
+                Cubs: 3 each
+            </p>
+            <div class="admin-controls admin-only">
+                <button onclick="updateCount(this,-1)">➖</button>
+                <button onclick="updateCount(this,1)">➕</button>
+            </div>
         </div>
 
         <!-- 🦁 LION -->
-        <div class="animal-card">
-            <img src="../assets/lion.jpg" class="rotate">
-
+        <div class="animal-card" data-animal="lion" data-default="3">
+            <img src="../assets/lion.jpg" class="rotate" alt="Lion">
             <h3>Lion 🦁</h3>
-            <p>3 Lions in territory</p>
+            <p>
+                Count: <span id="lion-count" class="animal-count">3</span>
+                <span class="save-status" id="lion-status"></span><br>
+                3 Lions in territory
+            </p>
+            <div class="admin-controls admin-only">
+                <button onclick="updateCount(this,-1)">➖</button>
+                <button onclick="updateCount(this,1)">➕</button>
+            </div>
         </div>
 
         <!-- 🦌 DEER -->
-        <div class="animal-card">
-            <img src="../assets/deer" class="rotate">
-
+        <div class="animal-card" data-animal="deer" data-default="25">
+            <img src="../assets/deer" class="rotate" alt="Deer">
             <h3>Deer 🦌</h3>
-            <p>25+ in grasslands</p>
+            <p>
+                Count: <span id="deer-count" class="animal-count">25</span>
+                <span class="save-status" id="deer-status"></span><br>
+                In grasslands
+            </p>
+            <div class="admin-controls admin-only">
+                <button onclick="updateCount(this,-1)">➖</button>
+                <button onclick="updateCount(this,1)">➕</button>
+            </div>
         </div>
 
         <!-- 🐍 SNAKE -->
-        <div class="animal-card">
-            <img src="../assets/snake1.webp" class="rotate">
+        <div class="animal-card" data-animal="snake" data-default="12">
+            <img src="../assets/snake1.webp" class="rotate" alt="Snake">
             <h3>Snake 🐍</h3>
             <p>
-                Count: 12<br>
-                Nests: 4<br>
-                Avg Age: 2–5 yrs<br>
+                Count: <span id="snake-count" class="animal-count">12</span>
+                <span class="save-status" id="snake-status"></span><br>
+                Nests: 4 · Avg Age: 2–5 yrs<br>
                 Habitat: Dense undergrowth
             </p>
+            <div class="admin-controls admin-only">
+                <button onclick="updateCount(this,-1)">➖</button>
+                <button onclick="updateCount(this,1)">➕</button>
+            </div>
         </div>
 
         <!-- 🦩 FLAMINGO -->
-        <div class="animal-card">
-            <img src="../assets/flamingo" class="rotate">
+        <div class="animal-card" data-animal="flamingo" data-default="6">
+            <img src="../assets/flamingo" class="rotate" alt="Flamingo">
             <h3>Flamingo 🦩</h3>
             <p>
-                Count: 6<br>
-                Chicks: 5<br>
-                Avg Age: 3–8 yrs<br>
-                Habitat: Lakes & marshes
+                Count: <span id="flamingo-count" class="animal-count">6</span>
+                <span class="save-status" id="flamingo-status"></span><br>
+                Chicks: 5 · Avg Age: 3–8 yrs<br>
+                Habitat: Lakes &amp; marshes
             </p>
+            <div class="admin-controls admin-only">
+                <button onclick="updateCount(this,-1)">➖</button>
+                <button onclick="updateCount(this,1)">➕</button>
+            </div>
         </div>
 
         <!-- 🐆 LEOPARD -->
-        <div class="animal-card">
-            <img src="../assets/leopard.jpg" class="rotate">
+        <div class="animal-card" data-animal="leopard" data-default="3">
+            <img src="../assets/leopard.jpg" class="rotate" alt="Leopard">
             <h3>Leopard 🐆</h3>
             <p>
-                Count: 3<br>
-                Cubs: 2<br>
-                Avg Age: 4–10 yrs<br>
+                Count: <span id="leopard-count" class="animal-count">3</span>
+                <span class="save-status" id="leopard-status"></span><br>
+                Cubs: 2 · Avg Age: 4–10 yrs<br>
                 Habitat: Rocky forest zones
             </p>
+            <div class="admin-controls admin-only">
+                <button onclick="updateCount(this,-1)">➖</button>
+                <button onclick="updateCount(this,1)">➕</button>
+            </div>
         </div>
 
         <!-- 🐂 NILGAI -->
-        <div class="animal-card">
-            <img src="../assets/nilgai1.jpg" class="rotate">
+        <div class="animal-card" data-animal="nilgai" data-default="9">
+            <img src="../assets/nilgai1.jpg" class="rotate" alt="Nilgai">
             <h3>Nilgai 🐂</h3>
             <p>
-                Count: 9<br>
-                Calves: 3<br>
-                Avg Age: 5–12 yrs<br>
+                Count: <span id="nilgai-count" class="animal-count">9</span>
+                <span class="save-status" id="nilgai-status"></span><br>
+                Calves: 3 · Avg Age: 5–12 yrs<br>
                 Habitat: Open plains
             </p>
+            <div class="admin-controls admin-only">
+                <button onclick="updateCount(this,-1)">➖</button>
+                <button onclick="updateCount(this,1)">➕</button>
+            </div>
         </div>
 
         <!-- 🐗 WILD BOAR -->
-        <div class="animal-card">
-            <img src="../assets/boar" class="rotate">
+        <div class="animal-card" data-animal="wildboar" data-default="14">
+            <img src="../assets/boar" class="rotate" alt="Wild Boar">
             <h3>Wild Boar 🐗</h3>
             <p>
-                Count: 14<br>
-                Groups: Active<br>
-                Avg Age: 3–7 yrs<br>
+                Count: <span id="wildboar-count" class="animal-count">14</span>
+                <span class="save-status" id="wildboar-status"></span><br>
+                Groups: Active · Avg Age: 3–7 yrs<br>
                 Habitat: Forest edges
             </p>
+            <div class="admin-controls admin-only">
+                <button onclick="updateCount(this,-1)">➖</button>
+                <button onclick="updateCount(this,1)">➕</button>
+            </div>
         </div>
 
         <!-- 🐊 CROCODILE -->
-        <div class="animal-card">
-            <img src="../assets/crocodile.webp" class="rotate">
+        <div class="animal-card" data-animal="crocodile" data-default="5">
+            <img src="../assets/crocodile.webp" class="rotate" alt="Crocodile">
             <h3>Marsh Crocodile 🐊</h3>
             <p>
-                Count: 5<br>
-                Nests: 2<br>
-                Avg Age: 10–25 yrs<br>
+                Count: <span id="crocodile-count" class="animal-count">5</span>
+                <span class="save-status" id="crocodile-status"></span><br>
+                Nests: 2 · Avg Age: 10–25 yrs<br>
                 Habitat: Riverbanks
             </p>
+            <div class="admin-controls admin-only">
+                <button onclick="updateCount(this,-1)">➖</button>
+                <button onclick="updateCount(this,1)">➕</button>
+            </div>
         </div>
 
         <!-- 🦎 MONITOR LIZARD -->
-        <div class="animal-card">
-            <img src="../assets/monitorliz.jpg" class="rotate">
+        <div class="animal-card" data-animal="monitorlizard" data-default="7">
+            <img src="../assets/monitorliz.jpg" class="rotate" alt="Monitor Lizard">
             <h3>Monitor Lizard 🦎</h3>
             <p>
-                Count: 7<br>
-                Sightings: Frequent<br>
-                Avg Age: 4–10 yrs<br>
+                Count: <span id="monitorlizard-count" class="animal-count">7</span>
+                <span class="save-status" id="monitorlizard-status"></span><br>
+                Sightings: Frequent · Avg Age: 4–10 yrs<br>
                 Habitat: Dry forest
             </p>
+            <div class="admin-controls admin-only">
+                <button onclick="updateCount(this,-1)">➖</button>
+                <button onclick="updateCount(this,1)">➕</button>
+            </div>
         </div>
 
         <!-- 🐢 TORTOISE -->
-        <div class="animal-card">
-            <img src="../assets/tortoise.jpg" class="rotate">
+        <div class="animal-card" data-animal="tortoise" data-default="4">
+            <img src="../assets/tortoise.jpg" class="rotate" alt="Tortoise">
             <h3>Tortoise 🐢</h3>
             <p>
-                Count: 4<br>
-                Movement: Slow zones<br>
-                Avg Age: 40–80 yrs<br>
+                Count: <span id="tortoise-count" class="animal-count">4</span>
+                <span class="save-status" id="tortoise-status"></span><br>
+                Movement: Slow zones · Avg Age: 40–80 yrs<br>
                 Habitat: Forest floor
             </p>
+            <div class="admin-controls admin-only">
+                <button onclick="updateCount(this,-1)">➖</button>
+                <button onclick="updateCount(this,1)">➕</button>
+            </div>
         </div>
 
         <!-- 🦉 OWL -->
-        <div class="animal-card">
-            <img src="../assets/owl.webp" class="rotate">
+        <div class="animal-card" data-animal="owl" data-default="3">
+            <img src="../assets/owl.webp" class="rotate" alt="Owl">
             <h3>Brown Fish Owl 🦉</h3>
             <p>
-                Count: 3<br>
-                Activity: Nocturnal<br>
-                Avg Age: 5–12 yrs<br>
+                Count: <span id="owl-count" class="animal-count">3</span>
+                <span class="save-status" id="owl-status"></span><br>
+                Activity: Nocturnal · Avg Age: 5–12 yrs<br>
                 Habitat: Near water
             </p>
+            <div class="admin-controls admin-only">
+                <button onclick="updateCount(this,-1)">➖</button>
+                <button onclick="updateCount(this,1)">➕</button>
+            </div>
         </div>
 
         <!-- 🐺 HYENA -->
-        <div class="animal-card">
-            <img src="../assets/hyena.jpg" class="rotate">
+        <div class="animal-card" data-animal="hyena" data-default="2">
+            <img src="../assets/hyena.jpg" class="rotate" alt="Hyena">
             <h3>Striped Hyena 🐺</h3>
             <p>
-                Count: 2<br>
-                Behavior: Scavenger<br>
-                Avg Age: 6–12 yrs<br>
+                Count: <span id="hyena-count" class="animal-count">2</span>
+                <span class="save-status" id="hyena-status"></span><br>
+                Behavior: Scavenger · Avg Age: 6–12 yrs<br>
                 Habitat: Dry regions
             </p>
+            <div class="admin-controls admin-only">
+                <button onclick="updateCount(this,-1)">➖</button>
+                <button onclick="updateCount(this,1)">➕</button>
+            </div>
         </div>
+
         <!-- 🐘 ELEPHANT -->
-        <div class="animal-card">
-            <img src="../assets/elephant.jpg" class="rotate">
+        <div class="animal-card" data-animal="elephant" data-default="3">
+            <img src="../assets/elephant.jpg" class="rotate" alt="Elephant">
             <h3>Elephant 🐘</h3>
             <p>
-                Count: 3<br>
-                Herd: Small group<br>
-                Avg Age: 15–40 yrs<br>
+                Count: <span id="elephant-count" class="animal-count">3</span>
+                <span class="save-status" id="elephant-status"></span><br>
+                Herd: Small group · Avg Age: 15–40 yrs<br>
                 Habitat: River trails
             </p>
+            <div class="admin-controls admin-only">
+                <button onclick="updateCount(this,-1)">➖</button>
+                <button onclick="updateCount(this,1)">➕</button>
+            </div>
         </div>
 
         <!-- 🐻 SLOTH BEAR -->
-        <div class="animal-card">
-            <img src="../assets/slothbear.jpg" class="rotate">
+        <div class="animal-card" data-animal="slothbear" data-default="1">
+            <img src="../assets/slothbear.jpg" class="rotate" alt="Sloth Bear">
             <h3>Sloth Bear 🐻</h3>
             <p>
-                Count: 1<br>
-                Status: <span class="new">Newly recorded</span><br>
-                Avg Age: ~7 yrs<br>
+                Count: <span id="slothbear-count" class="animal-count">1</span>
+                <span class="save-status" id="slothbear-status"></span><br>
+                Status: <span class="new">Newly recorded</span> · Avg Age: ~7 yrs<br>
                 Habitat: Dense forest
             </p>
+            <div class="admin-controls admin-only">
+                <button onclick="updateCount(this,-1)">➖</button>
+                <button onclick="updateCount(this,1)">➕</button>
+            </div>
         </div>
 
         <!-- 🐺 INDIAN WOLF -->
-        <div class="animal-card">
-            <img src="../assets/wolf.jpg" class="rotate">
+        <div class="animal-card" data-animal="wolf" data-default="2">
+            <img src="../assets/wolf.jpg" class="rotate" alt="Wolf">
             <h3>Indian Wolf 🐺</h3>
             <p>
-                Count: 2<br>
-                Pack: Small<br>
-                Avg Age: 4–8 yrs<br>
+                Count: <span id="wolf-count" class="animal-count">2</span>
+                <span class="save-status" id="wolf-status"></span><br>
+                Pack: Small · Avg Age: 4–8 yrs<br>
                 Habitat: Grassland edges
             </p>
+            <div class="admin-controls admin-only">
+                <button onclick="updateCount(this,-1)">➖</button>
+                <button onclick="updateCount(this,1)">➕</button>
+            </div>
         </div>
 
         <!-- 🐕 DHOLE -->
-        <div class="animal-card">
-            <img src="../assets/dhole.webp" class="rotate">
+        <div class="animal-card" data-animal="dhole" data-default="3">
+            <img src="../assets/dhole.webp" class="rotate" alt="Dhole">
             <h3>Dhole (Wild Dog) 🐕</h3>
             <p>
-                Count: 3<br>
-                Pack Activity: High<br>
-                Avg Age: 3–7 yrs<br>
+                Count: <span id="dhole-count" class="animal-count">3</span>
+                <span class="save-status" id="dhole-status"></span><br>
+                Pack Activity: High · Avg Age: 3–7 yrs<br>
                 Habitat: Forest trails
             </p>
+            <div class="admin-controls admin-only">
+                <button onclick="updateCount(this,-1)">➖</button>
+                <button onclick="updateCount(this,1)">➕</button>
+            </div>
         </div>
 
         <!-- 🦌 SAMBAR DEER -->
-        <div class="animal-card">
-            <img src="../assets/sambardeer.jpg" class="rotate">
+        <div class="animal-card" data-animal="sambardeer" data-default="5">
+            <img src="../assets/sambardeer.jpg" class="rotate" alt="Sambar Deer">
             <h3>Sambar Deer 🦌</h3>
             <p>
-                Count: 5<br>
-                Group Movement<br>
-                Avg Age: 4–10 yrs<br>
+                Count: <span id="sambardeer-count" class="animal-count">5</span>
+                <span class="save-status" id="sambardeer-status"></span><br>
+                Group Movement · Avg Age: 4–10 yrs<br>
                 Habitat: Mixed forest
             </p>
+            <div class="admin-controls admin-only">
+                <button onclick="updateCount(this,-1)">➖</button>
+                <button onclick="updateCount(this,1)">➕</button>
+            </div>
         </div>
 
         <!-- 🐾 PORCUPINE -->
-        <div class="animal-card">
-            <img src="../assets/porcupine1.webp" class="rotate">
+        <div class="animal-card" data-animal="porcupine" data-default="2">
+            <img src="../assets/porcupine1.webp" class="rotate" alt="Porcupine">
             <h3>Porcupine 🐾</h3>
             <p>
-                Count: 2<br>
-                Activity: Nocturnal<br>
-                Avg Age: 3–6 yrs<br>
+                Count: <span id="porcupine-count" class="animal-count">2</span>
+                <span class="save-status" id="porcupine-status"></span><br>
+                Activity: Nocturnal · Avg Age: 3–6 yrs<br>
                 Habitat: Burrows
             </p>
+            <div class="admin-controls admin-only">
+                <button onclick="updateCount(this,-1)">➖</button>
+                <button onclick="updateCount(this,1)">➕</button>
+            </div>
         </div>
 
         <!-- 🦊 JACKAL -->
-        <div class="animal-card">
-            <img src="../assets/jackal.jpg" class="rotate">
+        <div class="animal-card" data-animal="jackal" data-default="2">
+            <img src="../assets/jackal.jpg" class="rotate" alt="Jackal">
             <h3>Golden Jackal 🦊</h3>
             <p>
-                Count: 2<br>
-                Behavior: Scavenger<br>
-                Avg Age: 5–9 yrs<br>
+                Count: <span id="jackal-count" class="animal-count">2</span>
+                <span class="save-status" id="jackal-status"></span><br>
+                Behavior: Scavenger · Avg Age: 5–9 yrs<br>
                 Habitat: Open scrub
             </p>
+            <div class="admin-controls admin-only">
+                <button onclick="updateCount(this,-1)">➖</button>
+                <button onclick="updateCount(this,1)">➕</button>
+            </div>
         </div>
 
         <!-- 🐍 KING COBRA -->
-        <div class="animal-card">
-            <img src="../assets/kingCobra.jpg" class="rotate">
+        <div class="animal-card" data-animal="kingcobra" data-default="1">
+            <img src="../assets/kingCobra.jpg" class="rotate" alt="King Cobra">
             <h3>King Cobra 🐍</h3>
             <p>
-                Count: 1<br>
-                Status: <span class="new">New Entry</span><br>
-                Avg Age: ~6 yrs<br>
+                Count: <span id="kingcobra-count" class="animal-count">1</span>
+                <span class="save-status" id="kingcobra-status"></span><br>
+                Status: <span class="new">New Entry</span> · Avg Age: ~6 yrs<br>
                 Habitat: Deep forest
             </p>
+            <div class="admin-controls admin-only">
+                <button onclick="updateCount(this,-1)">➖</button>
+                <button onclick="updateCount(this,1)">➕</button>
+            </div>
         </div>
 
         <!-- 🦅 SERPENT EAGLE -->
-        <div class="animal-card">
-            <img src="../assets/serpentEagle.jpg" class="rotate">
+        <div class="animal-card" data-animal="serpenteagle" data-default="2">
+            <img src="../assets/serpentEagle.jpg" class="rotate" alt="Serpent Eagle">
             <h3>Serpent Eagle 🦅</h3>
             <p>
-                Count: 2<br>
-                Sightings: Recent<br>
-                Avg Age: 5–10 yrs<br>
+                Count: <span id="serpenteagle-count" class="animal-count">2</span>
+                <span class="save-status" id="serpenteagle-status"></span><br>
+                Sightings: Recent · Avg Age: 5–10 yrs<br>
                 Habitat: High canopy
             </p>
+            <div class="admin-controls admin-only">
+                <button onclick="updateCount(this,-1)">➖</button>
+                <button onclick="updateCount(this,1)">➕</button>
+            </div>
         </div>
 
         <!-- 🐒 LANGUR -->
-        <div class="animal-card">
-            <img src="../assets/langur.jpg" class="rotate">
+        <div class="animal-card" data-animal="langur" data-default="6">
+            <img src="../assets/langur.jpg" class="rotate" alt="Langur">
             <h3>Hanuman Langur 🐒</h3>
             <p>
-                Count: 6<br>
-                Troop Movement<br>
-                Avg Age: 6–15 yrs<br>
+                Count: <span id="langur-count" class="animal-count">6</span>
+                <span class="save-status" id="langur-status"></span><br>
+                Troop Movement · Avg Age: 6–15 yrs<br>
                 Habitat: Tree canopy
             </p>
+            <div class="admin-controls admin-only">
+                <button onclick="updateCount(this,-1)">➖</button>
+                <button onclick="updateCount(this,1)">➕</button>
+            </div>
         </div>
+
         <!-- 🐃 INDIAN GAUR -->
-        <div class="animal-card">
-            <img src="../assets/gaur.jpg" class="rotate">
+        <div class="animal-card" data-animal="gaur" data-default="3">
+            <img src="../assets/gaur.jpg" class="rotate" alt="Indian Gaur">
             <h3>Indian Gaur 🐃</h3>
             <p>
-                Count: 3<br>
-                Herd: Small<br>
-                Avg Age: 8–18 yrs<br>
+                Count: <span id="gaur-count" class="animal-count">3</span>
+                <span class="save-status" id="gaur-status"></span><br>
+                Herd: Small · Avg Age: 8–18 yrs<br>
                 Habitat: Dense forest edges
             </p>
+            <div class="admin-controls admin-only">
+                <button onclick="updateCount(this,-1)">➖</button>
+                <button onclick="updateCount(this,1)">➕</button>
+            </div>
         </div>
 
         <!-- 🐾 INDIAN CIVET -->
-        <div class="animal-card">
-            <img src="../assets/civet.jpg" class="rotate">
+        <div class="animal-card" data-animal="civet" data-default="2">
+            <img src="../assets/civet.jpg" class="rotate" alt="Indian Civet">
             <h3>Indian Civet 🐾</h3>
             <p>
-                Count: 2<br>
-                Activity: Nocturnal<br>
-                Avg Age: 4–10 yrs<br>
+                Count: <span id="civet-count" class="animal-count">2</span>
+                <span class="save-status" id="civet-status"></span><br>
+                Activity: Nocturnal · Avg Age: 4–10 yrs<br>
                 Habitat: Forest interiors
             </p>
+            <div class="admin-controls admin-only">
+                <button onclick="updateCount(this,-1)">➖</button>
+                <button onclick="updateCount(this,1)">➕</button>
+            </div>
         </div>
 
         <!-- 🐈 RUSTY-SPOTTED CAT -->
-        <div class="animal-card">
-            <img src="../assets/rustycat.jpg" class="rotate">
+        <div class="animal-card" data-animal="rustycat" data-default="1">
+            <img src="../assets/rustycat.jpg" class="rotate" alt="Rusty-Spotted Cat">
             <h3>Rusty-Spotted Cat 🐈</h3>
             <p>
-                Count: 1<br>
-                Status: <span class="new">Rare sighting</span><br>
-                Avg Age: ~3 yrs<br>
+                Count: <span id="rustycat-count" class="animal-count">1</span>
+                <span class="save-status" id="rustycat-status"></span><br>
+                Status: <span class="new">Rare sighting</span> · Avg Age: ~3 yrs<br>
                 Habitat: Thick vegetation
             </p>
+            <div class="admin-controls admin-only">
+                <button onclick="updateCount(this,-1)">➖</button>
+                <button onclick="updateCount(this,1)">➕</button>
+            </div>
         </div>
 
         <!-- 🐍 RAT SNAKE -->
-        <div class="animal-card">
-            <img src="../assets/ratsnake.webp" class="rotate">
+        <div class="animal-card" data-animal="ratsnake" data-default="5">
+            <img src="../assets/ratsnake.webp" class="rotate" alt="Rat Snake">
             <h3>Indian Rat Snake 🐍</h3>
             <p>
-                Count: 5<br>
-                Behavior: Non-venomous<br>
-                Avg Age: 3–6 yrs<br>
-                Habitat: Near water & fields
+                Count: <span id="ratsnake-count" class="animal-count">5</span>
+                <span class="save-status" id="ratsnake-status"></span><br>
+                Behavior: Non-venomous · Avg Age: 3–6 yrs<br>
+                Habitat: Near water &amp; fields
             </p>
+            <div class="admin-controls admin-only">
+                <button onclick="updateCount(this,-1)">➖</button>
+                <button onclick="updateCount(this,1)">➕</button>
+            </div>
         </div>
 
         <!-- 🦅 BLACK KITE -->
-        <div class="animal-card">
-            <img src="../assets/blackkite.jpg" class="rotate">
+        <div class="animal-card" data-animal="blackkite" data-default="4">
+            <img src="../assets/blackkite.jpg" class="rotate" alt="Black Kite">
             <h3>Black Kite 🦅</h3>
             <p>
-                Count: 4<br>
-                Flight: High soaring<br>
-                Avg Age: 6–12 yrs<br>
+                Count: <span id="blackkite-count" class="animal-count">4</span>
+                <span class="save-status" id="blackkite-status"></span><br>
+                Flight: High soaring · Avg Age: 6–12 yrs<br>
                 Habitat: Open sky zones
             </p>
+            <div class="admin-controls admin-only">
+                <button onclick="updateCount(this,-1)">➖</button>
+                <button onclick="updateCount(this,1)">➕</button>
+            </div>
         </div>
 
         <!-- 🐦 PEACOCK -->
-        <div class="animal-card">
-            <img src="../assets/peacock.webp" class="rotate">
+        <div class="animal-card" data-animal="peacock" data-default="7">
+            <img src="../assets/peacock.webp" class="rotate" alt="Peacock">
             <h3>Indian Peacock 🐦</h3>
             <p>
-                Count: 7<br>
-                Display: Active<br>
-                Avg Age: 5–10 yrs<br>
+                Count: <span id="peacock-count" class="animal-count">7</span>
+                <span class="save-status" id="peacock-status"></span><br>
+                Display: Active · Avg Age: 5–10 yrs<br>
                 Habitat: Open forest
             </p>
+            <div class="admin-controls admin-only">
+                <button onclick="updateCount(this,-1)">➖</button>
+                <button onclick="updateCount(this,1)">➕</button>
+            </div>
         </div>
 
-        <!-- 🐗 HOG DEER -->
-        <div class="animal-card">
-            <img src="../assets/hogdeer.jpg" class="rotate">
+        <!-- 🦌 HOG DEER -->
+        <div class="animal-card" data-animal="hogdeer" data-default="3">
+            <img src="../assets/hogdeer.jpg" class="rotate" alt="Hog Deer">
             <h3>Hog Deer 🦌</h3>
             <p>
-                Count: 3<br>
-                Movement: Solitary<br>
-                Avg Age: 4–8 yrs<br>
+                Count: <span id="hogdeer-count" class="animal-count">3</span>
+                <span class="save-status" id="hogdeer-status"></span><br>
+                Movement: Solitary · Avg Age: 4–8 yrs<br>
                 Habitat: Grasslands
             </p>
+            <div class="admin-controls admin-only">
+                <button onclick="updateCount(this,-1)">➖</button>
+                <button onclick="updateCount(this,1)">➕</button>
+            </div>
         </div>
 
-        <!-- 🐾 INDIAN PALM SQUIRREL -->
-        <div class="animal-card">
-            <img src="../assets/palmsquirrel.webp" class="rotate">
+        <!-- 🐾 PALM SQUIRREL -->
+        <div class="animal-card" data-animal="palmsquirrel" data-default="6">
+            <img src="../assets/palmsquirrel.webp" class="rotate" alt="Palm Squirrel">
             <h3>Palm Squirrel 🐾</h3>
             <p>
-                Count: 6<br>
-                Activity: Daytime<br>
-                Avg Age: 2–4 yrs<br>
+                Count: <span id="palmsquirrel-count" class="animal-count">6</span>
+                <span class="save-status" id="palmsquirrel-status"></span><br>
+                Activity: Daytime · Avg Age: 2–4 yrs<br>
                 Habitat: Trees near camps
             </p>
+            <div class="admin-controls admin-only">
+                <button onclick="updateCount(this,-1)">➖</button>
+                <button onclick="updateCount(this,1)">➕</button>
+            </div>
         </div>
 
         <!-- 🦉 SPOTTED OWLET -->
-        <div class="animal-card">
-            <img src="../assets/owlspotted.jpg" class="rotate">
+        <div class="animal-card" data-animal="spottedowlet" data-default="2">
+            <img src="../assets/owlspotted.jpg" class="rotate" alt="Spotted Owlet">
             <h3>Spotted Owlet 🦉</h3>
             <p>
-                Count: 2<br>
-                Activity: Nocturnal<br>
-                Avg Age: 4–9 yrs<br>
+                Count: <span id="spottedowlet-count" class="animal-count">2</span>
+                <span class="save-status" id="spottedowlet-status"></span><br>
+                Activity: Nocturnal · Avg Age: 4–9 yrs<br>
                 Habitat: Tree hollows
             </p>
+            <div class="admin-controls admin-only">
+                <button onclick="updateCount(this,-1)">➖</button>
+                <button onclick="updateCount(this,1)">➕</button>
+            </div>
         </div>
 
         <!-- 🐦 KINGFISHER -->
-        <div class="animal-card">
-            <img src="../assets/kingfisher.jpg" class="rotate">
+        <div class="animal-card" data-animal="kingfisher" data-default="3">
+            <img src="../assets/kingfisher.jpg" class="rotate" alt="Kingfisher">
             <h3>Kingfisher 🐦</h3>
             <p>
-                Count: 3<br>
-                Hunting: Water dives<br>
-                Avg Age: 3–6 yrs<br>
+                Count: <span id="kingfisher-count" class="animal-count">3</span>
+                <span class="save-status" id="kingfisher-status"></span><br>
+                Hunting: Water dives · Avg Age: 3–6 yrs<br>
                 Habitat: Riverbanks
             </p>
+            <div class="admin-controls admin-only">
+                <button onclick="updateCount(this,-1)">➖</button>
+                <button onclick="updateCount(this,1)">➕</button>
+            </div>
         </div>
 
         <!-- 🐍 COMMON KRAIT -->
-        <div class="animal-card">
-            <img src="../assets/COMMONKRAIT.jpg" class="rotate">
+        <div class="animal-card" data-animal="commonkrait" data-default="1">
+            <img src="../assets/COMMONKRAIT.jpg" class="rotate" alt="Common Krait">
             <h3>Common Krait 🐍</h3>
             <p>
-                Count: 1<br>
-                Status: <span class="new">Recently identified</span><br>
-                Avg Age: ~5 yrs<br>
+                Count: <span id="commonkrait-count" class="animal-count">1</span>
+                <span class="save-status" id="commonkrait-status"></span><br>
+                Status: <span class="new">Recently identified</span> · Avg Age: ~5 yrs<br>
                 Habitat: Dense forest
             </p>
+            <div class="admin-controls admin-only">
+                <button onclick="updateCount(this,-1)">➖</button>
+                <button onclick="updateCount(this,1)">➕</button>
+            </div>
         </div>
 
         <!-- 🐕 INDIAN PARIAH DOG -->
-        <div class="animal-card">
-            <img src="../assets/dog1.webp" class="rotate">
+        <div class="animal-card" data-animal="pariadog" data-default="2">
+            <img src="../assets/dog1.webp" class="rotate" alt="Indian Pariah Dog">
             <h3>Indian Pariah Dog 🐕</h3>
             <p>
-                Count: 2<br>
-                Behavior: Scavenger<br>
-                Avg Age: 4–9 yrs<br>
+                Count: <span id="pariadog-count" class="animal-count">2</span>
+                <span class="save-status" id="pariadog-status"></span><br>
+                Behavior: Scavenger · Avg Age: 4–9 yrs<br>
                 Habitat: Near human zones
             </p>
+            <div class="admin-controls admin-only">
+                <button onclick="updateCount(this,-1)">➖</button>
+                <button onclick="updateCount(this,1)">➕</button>
+            </div>
         </div>
 
     </section>
-
 
     <div id="vetPopup" class="vet-popup">
         🐾 Animal Welfare Vet <br>
         📞 +91 88795 XXXXX
     </div>
-
-
 
     <!-- 🦶 FOOTER -->
     <footer>
@@ -455,27 +680,93 @@
         <p>Goal: Ensuring wildlife safety and intelligent monitoring.</p>
     </footer>
 
+    <!-- ✅ Firebase COMPAT — plain script, no imports needed -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
 
     <script>
-        const role = localStorage.getItem("role");
+        // ════════════════════════════════════
+        // 🔥 YOUR FIREBASE CONFIG
+        // ════════════════════════════════════
+        const firebaseConfig = {
+            apiKey: "AIzaSyACPigoO6zD_cW_tmdbL91j2dWgLaicOds",
+            authDomain: "aaranyak-911d6.firebaseapp.com",
+            databaseURL: "https://aaranyak-911d6-default-rtdb.firebaseio.com",
+            projectId: "aaranyak-911d6",
+            storageBucket: "aaranyak-911d6.firebasestorage.app",
+            messagingSenderId: "484894981143",
+            appId: "1:484894981143:web:f9c765d81b08dbee6ab052"
+        };
 
-        // hide everything first
-        document.querySelectorAll(".admin-only").forEach(el => el.style.display = "none");
-        document.querySelectorAll(".user-only").forEach(el => el.style.display = "none");
+        firebase.initializeApp(firebaseConfig);
+        var db = firebase.database();
 
-        if (role === "admin") {
-            document.querySelectorAll(".admin-only").forEach(el => el.style.display = "inline-block");
-        } else {
-            document.querySelectorAll(".user-only").forEach(el => el.style.display = "inline-block");
+        // ════════════════════════════════════
+        // 🐾 IN-MEMORY COUNT STORE
+        // ════════════════════════════════════
+        var counts = {};
+
+        // ════════════════════════════════════
+        // 👤 ROLE CHECK — show admin buttons
+        // ════════════════════════════════════
+        var role = localStorage.getItem("role");
+        document.querySelectorAll(".admin-only").forEach(function (el) {
+            el.style.display = (role === "admin") ? "flex" : "none";
+        });
+
+        // ════════════════════════════════════
+        // 📡 LISTEN TO FIREBASE FOR EACH CARD
+        //    Real-time: admin writes → users see instantly
+        // ════════════════════════════════════
+        document.querySelectorAll(".animal-card[data-animal]").forEach(function (card) {
+            var key = card.dataset.animal;
+            counts[key] = parseInt(card.dataset.default) || 0;
+
+            db.ref("animalCounts/" + key).on("value", function (snapshot) {
+                var val = snapshot.exists() ? snapshot.val() : counts[key];
+                counts[key] = val;
+                var span = document.getElementById(key + "-count");
+                if (span) span.textContent = val;
+            });
+        });
+
+        // ════════════════════════════════════
+        // ➕➖ UPDATE COUNT FUNCTION
+        //    Called directly by button onclick
+        // ════════════════════════════════════
+        function updateCount(btn, change) {
+            // Get the animal key from the parent card
+            var card = btn.closest(".animal-card[data-animal]");
+            if (!card) return;
+            var key = card.dataset.animal;
+
+            // Step 1: instant local update — UI responds immediately
+            var newVal = Math.max(0, (counts[key] || 0) + change);
+            counts[key] = newVal;
+            var span = document.getElementById(key + "-count");
+            if (span) span.textContent = newVal;
+
+            // Step 2: write to Firebase — all users see update live
+            db.ref("animalCounts/" + key).set(newVal)
+                .then(function () {
+                    var status = document.getElementById(key + "-status");
+                    if (status) {
+                        status.textContent = "Saved ✓";
+                        status.style.color = "#2d6a2d";
+                        status.style.opacity = 1;
+                        setTimeout(function () { status.style.opacity = 0; }, 1500);
+                    }
+                })
+                .catch(function (err) {
+                    console.error("Firebase error:", err);
+                    var status = document.getElementById(key + "-status");
+                    if (status) { status.textContent = "Error ✗"; status.style.color = "#e55"; }
+                });
         }
     </script>
-    <model-viewer src="your-tiger-model.glb" alt="A stunning 3D tiger" auto-rotate camera-controls
-        interaction-prompt="none" shadow-intensity="1">
-    </model-viewer>
 
+    <!-- Your existing script -->
     <script type="module" src="../js/script.js"></script>
-
-
 
 </body>
 

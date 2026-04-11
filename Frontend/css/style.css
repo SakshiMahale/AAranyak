@@ -248,6 +248,27 @@ model-viewer {
     opacity: 0.85;
 }
 
+.admin-controls {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.admin-controls button {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 8px;
+    background: #4CAF50;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.admin-controls button:hover {
+    background: #22c55e;
+}
+
 /* ================================== FOOTER ===========================================================*/
 footer {
     margin-top: 50px;
@@ -1239,4 +1260,12 @@ body.payment-page {
         opacity: 1;
         transform: translateY(0);
     }
+}
+
+/*==============================INVOICE==========================================*/
+#invoiceBox {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    color: black;
 }

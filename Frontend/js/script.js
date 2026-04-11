@@ -577,11 +577,24 @@ async function payNow() {
             status.style.color = "lightgreen";
             status.innerText = "✅ Payment Successful!";
 
+            // ✅ SAVE INVOICE DATA BEFORE CLEARING
+            localStorage.setItem("invoiceData", JSON.stringify({
+                ...data,
+                paymentMethod: selectedMethod,
+                paymentStatus: "SUCCESS",
+                jeepId: assignedJeepId || "Not Assigned Yet"
+            }));
+
             localStorage.removeItem("bookingData");
 
+            // ✅ REDIRECT TO INVOICE PAGE
             setTimeout(() => {
-                window.location.href = "Role_Index.html";
+                window.location.href = "invoice.html";
             }, 2000);
+
+            window.onload = () => {
+                setTimeout(downloadInvoice, 1000);
+            };
 
             const delay = slotData.endTime - Date.now();
 
@@ -754,52 +767,52 @@ if (window.location.pathname.includes("history.html")) {
 
     import("./firebase.js").then(({ db }) => {
         import("https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js")
-        .then(({ ref, onValue }) => {
+            .then(({ ref, onValue }) => {
 
-            const tableBody = document.getElementById("historyTableBody");
-            if (!tableBody) return;
+                const tableBody = document.getElementById("historyTableBody");
+                if (!tableBody) return;
 
-            const historyRef = ref(db, "history");
+                const historyRef = ref(db, "history");
 
-            onValue(historyRef, (snapshot) => {
+                onValue(historyRef, (snapshot) => {
 
-                tableBody.innerHTML = "";
+                    tableBody.innerHTML = "";
 
-                if (!snapshot.exists()) {
-                    tableBody.innerHTML = `<tr><td colspan="5">No history found</td></tr>`;
-                    return;
-                }
+                    if (!snapshot.exists()) {
+                        tableBody.innerHTML = `<tr><td colspan="5">No history found</td></tr>`;
+                        return;
+                    }
 
-                const entries = [];
+                    const entries = [];
 
-                snapshot.forEach((userSnap) => {
+                    snapshot.forEach((userSnap) => {
 
-                    const data = userSnap.val();
+                        const data = userSnap.val();
 
-                    entries.push(data); // store first, don't render yet
-                });
+                        entries.push(data); // store first, don't render yet
+                    });
 
-                // 🔥 SORT latest first using completedAt
-                entries.sort((a, b) => (b.completedAt || 0) - (a.completedAt || 0));
+                    // 🔥 SORT latest first using completedAt
+                    entries.sort((a, b) => (b.completedAt || 0) - (a.completedAt || 0));
 
-                // 🔥 NOW render
-                entries.forEach((data) => {
+                    // 🔥 NOW render
+                    entries.forEach((data) => {
 
-                    const row = document.createElement("tr");
+                        const row = document.createElement("tr");
 
-                    row.innerHTML = `
+                        row.innerHTML = `
                         <td>${data.name || "N/A"}</td>
                         <td>${data.bookingDate || "N/A"}</td>
                         <td>${data.seatsBooked || 0}</td>
                         <td>${data.slot || "N/A"}</td>
                     `;
 
-                    tableBody.appendChild(row);
+                        tableBody.appendChild(row);
+                    });
+
                 });
 
             });
-
-        });
     });
 
 }
