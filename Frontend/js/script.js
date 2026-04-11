@@ -333,6 +333,7 @@ let role = localStorage.getItem("role");
 
 document.addEventListener("DOMContentLoaded", () => {
 
+    cleanupExpiredSafaris();
     if (window.location.pathname.includes("payment.html")) {
 
         if (role === "admin") {
@@ -596,49 +597,6 @@ async function payNow() {
                 setTimeout(downloadInvoice, 1000);
             };
 
-            const delay = slotData.endTime - Date.now();
-
-            if (delay > 0) {
-
-                setTimeout(async () => {
-
-                    try {
-
-                        const historyRef = ref(db, "history/" + uid);
-                        const userRef = ref(db, "safariSystem/user/" + uid);
-
-                        const userSnap = await get(userRef);
-
-                        if (userSnap.exists()) {
-
-                            const userData = userSnap.val();
-
-                            // ✅ MOVE TO HISTORY
-                            await push(historyRef, {
-                                ...userData,
-                                completedAt: Date.now()
-                            });
-
-                            // ✅ REMOVE USER
-                            await set(userRef, null);
-
-                            // ✅ REMOVE FROM ONLY ASSIGNED JEEP
-                            const jeepId = userData.jeepId;
-
-                            await set(ref(db, `safariSystem/jeep/${jeepId}/users/${uid}`), null);
-
-                            console.log("📦 Moved to history AFTER slot end");
-                        }
-
-                    } catch (err) {
-                        console.error("History move error:", err);
-                    }
-
-                }, delay);
-
-            } else {
-                console.log("⚠️ Slot already expired → not scheduling history move");
-            }
 
         } catch (error) {
             console.error("🔥 ERROR:", error);
@@ -815,4 +773,69 @@ if (window.location.pathname.includes("history.html")) {
             });
     });
 
+}
+
+// ================= AUTO CLEANUP SAFARI =================
+async function cleanupExpiredSafaris() {
+
+    const { db } = await import("./firebase.js");
+    const { ref, get, set, push, update } =
+        await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js");
+
+    const now = Date.now();
+
+    const userRef = ref(db, "safariSystem/user");
+    const jeepRef = ref(db, "safariSystem/jeep");
+
+    const userSnap = await get(userRef);
+
+    if (!userSnap.exists()) return;
+
+    const users = userSnap.val();
+
+    for (let uid in users) {
+
+        const user = users[uid];
+
+        // ✅ CHECK IF SLOT EXPIRED
+        if (user.endTime && now > user.endTime) {
+
+            console.log("⏳ Expired user:", uid);
+
+            // ================= MOVE TO HISTORY =================
+            await push(ref(db, "history/" + uid), {
+                ...user,
+                completedAt: now
+            });
+
+            // ================= REMOVE FROM JEEP =================
+            if (user.jeepId) {
+
+                const jeepUserRef = ref(db, `safariSystem/jeep/${user.jeepId}/users/${uid}`);
+                await set(jeepUserRef, null);
+
+                // 🔥 UPDATE SEAT COUNT
+                const jeepSnap = await get(ref(db, `safariSystem/jeep/${user.jeepId}`));
+
+                if (jeepSnap.exists()) {
+
+                    const jeepData = jeepSnap.val();
+                    let currentSeats = jeepData.seatCount || 0;
+
+                    let userSeats = user.seatsBooked || 0;
+
+                    let newSeats = currentSeats - userSeats;
+
+                    await update(ref(db, `safariSystem/jeep/${user.jeepId}`), {
+                        seatCount: Math.max(newSeats, 0)
+                    });
+                }
+            }
+
+            // ================= REMOVE USER =================
+            await set(ref(db, "safariSystem/user/" + uid), null);
+
+            console.log("✅ Moved to history & cleaned jeep");
+        }
+    }
 }
