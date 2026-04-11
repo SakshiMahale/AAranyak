@@ -585,7 +585,7 @@ async function payNow() {
                             const userData = userSnap.val();
 
                             // ✅ MOVE TO HISTORY
-                            await set(historyRef, {
+                            await push(historyRef, {
                                 ...userData,
                                 completedAt: Date.now()
                             });
@@ -733,3 +733,57 @@ document.addEventListener("DOMContentLoaded", function () {
 
 });
 
+// ================= HISTORY PAGE LOGIC =================
+if (window.location.pathname.includes("history.html")) {
+
+    import("./firebase.js").then(({ db }) => {
+        import("https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js")
+        .then(({ ref, onValue }) => {
+
+            const tableBody = document.getElementById("historyTableBody");
+            if (!tableBody) return;
+
+            const historyRef = ref(db, "history");
+
+            onValue(historyRef, (snapshot) => {
+
+                tableBody.innerHTML = "";
+
+                if (!snapshot.exists()) {
+                    tableBody.innerHTML = `<tr><td colspan="5">No history found</td></tr>`;
+                    return;
+                }
+
+                const entries = [];
+
+                snapshot.forEach((userSnap) => {
+
+                    const data = userSnap.val();
+
+                    entries.push(data); // store first, don't render yet
+                });
+
+                // 🔥 SORT latest first using completedAt
+                entries.sort((a, b) => (b.completedAt || 0) - (a.completedAt || 0));
+
+                // 🔥 NOW render
+                entries.forEach((data) => {
+
+                    const row = document.createElement("tr");
+
+                    row.innerHTML = `
+                        <td>${data.name || "N/A"}</td>
+                        <td>${data.bookingDate || "N/A"}</td>
+                        <td>${data.seatsBooked || 0}</td>
+                        <td>${data.slot || "N/A"}</td>
+                    `;
+
+                    tableBody.appendChild(row);
+                });
+
+            });
+
+        });
+    });
+
+}
