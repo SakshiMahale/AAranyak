@@ -743,27 +743,42 @@ if (window.location.pathname.includes("history.html")) {
 
                     const entries = [];
 
+                    // 🔥 LEVEL 1 → USERS
                     snapshot.forEach((userSnap) => {
 
-                        const data = userSnap.val();
+                        // 🔥 LEVEL 2 → EACH BOOKING
+                        userSnap.forEach((bookingSnap) => {
 
-                        entries.push(data); // store first, don't render yet
+                            const data = bookingSnap.val();
+
+                            // ❌ skip invalid / empty data
+                            if (
+                                !data ||
+                                !data.name ||
+                                !data.bookingDate ||
+                                !data.slot
+                            ) {
+                                return;
+                            }
+
+                            entries.push(data);
+                        });
                     });
 
-                    // 🔥 SORT latest first using completedAt
+                    // 🔥 SORT latest first
                     entries.sort((a, b) => (b.completedAt || 0) - (a.completedAt || 0));
 
-                    // 🔥 NOW render
+                    // 🔥 RENDER
                     entries.forEach((data) => {
 
                         const row = document.createElement("tr");
 
                         row.innerHTML = `
-                        <td>${data.name || "N/A"}</td>
-                        <td>${data.bookingDate || "N/A"}</td>
-                        <td>${data.seatsBooked || 0}</td>
-                        <td>${data.slot || "N/A"}</td>
-                    `;
+                            <td>${data.name || "N/A"}</td>
+                            <td>${data.bookingDate || "N/A"}</td>
+                            <td>${data.seatsBooked || 0}</td>
+                            <td>${data.slot || "N/A"}</td>
+                        `;
 
                         tableBody.appendChild(row);
                     });
