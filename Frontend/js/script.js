@@ -235,6 +235,22 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
+    // user can select valid dates only 
+    const dateInput = document.getElementById("date");
+    if (!dateInput) return;
+
+    const today = new Date();
+
+    // Format YYYY-MM-DD
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+
+    const minDate = `${yyyy}-${mm}-${dd}`;
+
+    // ✅ Restrict past dates
+    dateInput.setAttribute("min", minDate);
+
     // update total on input change
     ["male", "female", "child"].forEach(id => {
         document.getElementById(id)?.addEventListener("input", updateTotal);
