@@ -1,0 +1,100 @@
+script.js
+
+if (role === "admin") {
+        nav.innerHTML = `
+        <a href="Role_Index.html">Home</a>
+        <a href="ticket.html">Online Ticket Booking</a>
+        <a href="jeep.html">Jeep Tracker</a>
+        <a href="AdminPanel.html">Admin Panel</a>
+        <a href="history.html">History</a>  
+        
+        <button onclick="logout()">Logout</button>
+    `;
+    }
+
+invoice.html
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Invoice - आranyak</title>
+    <link rel="stylesheet" href="../css/style.css">
+
+    <link rel="icon" type="image/x-icon" href="../assets/vine.png">
+
+    <style>
+        .invoice-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            width: 80px;
+            height: auto;
+        }
+
+        #invoiceBox {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            color: black;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav>
+        <h1>आranyak</h1>
+        <div class="nav-links" id="navLinks"></div>
+    </nav>
+    <div class="container">
+
+        <!-- 🔥 HEADER WITH LOGO -->
+        <div class="invoice-header">
+            <h2>🧾 Safari Invoice</h2>
+            <img src="../assets/logo.png" class="logo">
+        </div>
+
+        <div id="invoiceBox"></div>
+
+
+        <button onclick="downloadInvoice()">⬇ Download Invoice</button>
+    </div>
+
+    <!-- PDF LIB -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <script>
+        const data = JSON.parse(localStorage.getItem("invoiceData"));
+
+        const box = document.getElementById("invoiceBox");
+
+        if (data) {
+            box.innerHTML = `
+                <p><b>Name:</b> ${data.name}</p>
+                <p><b>Date:</b> ${data.date}</p>
+                <p><b>Time Slot:</b> ${data.time}</p>
+                <p><b>Seats:</b> ${data.seats.join(", ")}</p>
+                <p><b>Total Amount:</b> ₹${data.totalAmount}</p>
+
+                <hr>
+
+                <h3>🚙 Jeep Details (Coming Soon)</h3>
+                <p>Will be updated after backend integration</p>
+            `;
+        }
+
+        function downloadInvoice() {
+            const element = document.getElementById("invoiceBox");
+
+            html2pdf().from(element).save("Aranyak_Invoice.pdf");
+        }
+    </script>
+    <script type="module" src="../js/script.js"></script>
+
+</body>
+
+</html>

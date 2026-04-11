@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Line Follower Track — Jeep Tracker</title>
+
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #111;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            font-family: monospace;
+            padding: 16px;
+            gap: 10px;
+        }
+
+        /* ── TOP CONTROLS ── */
+        #controls {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 10px 18px;
+            background: #1c1c1c;
+            border: 1px solid #333;
+            border-radius: 8px;
+            flex-wrap: wrap;
+        }
+
+        #controls label {
+            color: #aaa;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+        }
+
+        #controls input[type=range] {
+            width: 90px;
+            cursor: pointer;
+        }
+
+        #controls .val {
+            color: #eee;
+            font-weight: bold;
+            min-width: 40px;
+        }
+
+        #controls button {
+            padding: 5px 12px;
+            font-size: 12px;
+            background: #2a2a2a;
+            color: #ccc;
+            border: 1px solid #555;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: monospace;
+        }
+
+        #controls button:hover {
+            background: #3a3a3a;
+            color: #fff;
+        }
+
+        /* ── TRACK ── */
+        #trackWrapper {
+            position: relative;
+            width: 950px;
+            height: 510px;
+            border: 1px solid #333;
+            overflow: hidden;
+        }
+
+        #trackImage {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 950px;
+            height: 510px;
+            object-fit: fill;
+        }
+
+        #trackCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        /* ── JEEP CONTROL PANEL ── */
+        #jeepPanel {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 12px 20px;
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 8px;
+            flex-wrap: wrap;
+            width: 950px;
+        }
+
+        #jeepPanel .section-label {
+            color: #666;
+            font-size: 11px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        /* Play / Pause / Reset buttons */
+        .jeep-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            font-size: 13px;
+            font-family: monospace;
+            border-radius: 6px;
+            border: 1px solid #555;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        #btnPlay {
+            background: #1a3a1a;
+            color: #39ff14;
+            border-color: #39ff14;
+        }
+
+        #btnPlay:hover {
+            background: #2a5a2a;
+        }
+
+        #btnPause {
+            background: #3a2a00;
+            color: #f0c020;
+            border-color: #f0c020;
+        }
+
+        #btnPause:hover {
+            background: #5a4000;
+        }
+
+        #btnReset {
+            background: #2a1a1a;
+            color: #ff6060;
+            border-color: #ff6060;
+        }
+
+        #btnReset:hover {
+            background: #4a2a2a;
+        }
+
+        /* Speed slider */
+        #speedSlider {
+            width: 100px;
+        }
+
+        /* Coordinate display */
+        #coordBox {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 14px;
+            background: #0d0d0d;
+            border: 1px solid #333;
+            border-radius: 6px;
+            margin-left: auto;
+        }
+
+        #coordBox .label {
+            color: #555;
+            font-size: 11px;
+        }
+
+        #coordX,
+        #coordY {
+            color: #39ff14;
+            font-size: 15px;
+            font-weight: bold;
+            min-width: 38px;
+        }
+
+        #coordIdx {
+            color: #888;
+            font-size: 11px;
+        }
+
+        #statusBadge {
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+        }
+
+        .status-running {
+            background: #1a3a1a;
+            color: #39ff14;
+            border: 1px solid #39ff14;
+        }
+
+        .status-paused {
+            background: #3a2a00;
+            color: #f0c020;
+            border: 1px solid #f0c020;
+        }
+
+        .status-stopped {
+            background: #2a1a1a;
+            color: #ff6060;
+            border: 1px solid #ff6060;
+        }
+
+        /* ── LEGEND ── */
+        #legend {
+            display: flex;
+            gap: 20px;
+            font-size: 12px;
+        }
+
+        .leg {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #aaa;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        #info {
+            color: #444;
+            font-size: 11px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ── TOP TRACK CONTROLS ── -->
+    <div id="controls">
+        <label>
+            Half-offset (1cm/side):
+            <input type="range" id="offsetSlider" min="3" max="50" value="15">
+            <span class="val" id="offsetVal">15px</span>
+        </label>
+        <label><input type="checkbox" id="showCenter" checked> Center</label>
+        <label><input type="checkbox" id="showLeft" checked> Left</label>
+        <label><input type="checkbox" id="showRight" checked> Right</label>
+        <label><input type="checkbox" id="showBand" checked> Band</label>
+        <label>
+            Dot size:
+            <input type="range" id="dotSize" min="1" max="8" value="3">
+            <span class="val" id="dotVal">3</span>
+        </label>
+        <button id="copyBtn">Copy JS arrays ↗</button>
+    </div>
+
+    <!-- ── TRACK ── -->
+    <div id="trackWrapper">
+        <img id="trackImage" src="track.png" alt="track">
+        <canvas id="trackCanvas" width="950" height="510"></canvas>
+    </div>
+
+    <!-- ── JEEP CONTROL PANEL ── -->
+    <div id="jeepPanel">
+        <span class="section-label">Jeep</span>
+
+        <button class="jeep-btn" id="btnPlay">▶ Play</button>
+        <button class="jeep-btn" id="btnPause">⏸ Pause</button>
+        <button class="jeep-btn" id="btnReset">↺ Reset</button>
+
+        <label style="color:#aaa;font-size:12px;display:flex;align-items:center;gap:8px;">
+            Speed:
+            <input type="range" id="speedSlider" min="1" max="20" value="5">
+            <span class="val" id="speedVal">5</span>
+            <span style="color:#555;font-size:11px;">pts/frame</span>
+        </label>
+
+        <span id="statusBadge" class="status-stopped">STOPPED</span>
+
+        <div id="coordBox">
+            <span class="label">JEEP POSITION</span>
+            <span style="color:#555">x:</span><span id="coordX">—</span>
+            <span style="color:#555">y:</span><span id="coordY">—</span>
+            <span id="coordIdx" style="color:#555"></span>
+        </div>
+    </div>
+
+    <!-- ── LEGEND ── -->
+    <div id="legend">
+        <div class="leg">
+            <div class="dot" style="background:#39ff14"></div> Center path
+        </div>
+        <div class="leg">
+            <div class="dot" style="background:#f0c020"></div> Left boundary (−1cm)
+        </div>
+        <div class="leg">
+            <div class="dot" style="background:#20d0e0"></div> Right boundary (+1cm)
+        </div>
+        <div class="leg">
+            <div class="dot" style="background:#ff3030;border:2px solid #fff"></div> Jeep
+        </div>
+    </div>
+    <div id="info">Adjust offset slider until boundaries align with track edges. Use Jeep controls to animate.</div>
+
+    <script>
+        // ── CENTER PATH — CLOSED LOOP ─────────────────────────────────────────────
+        const centerPoints = [
+            { x: 220, y: 55 },
+            { x: 205, y: 54 }, { x: 180, y: 54 }, { x: 155, y: 54 },
+            { x: 130, y: 54 }, { x: 105, y: 55 }, { x: 80, y: 63 },
+            { x: 56, y: 85 }, { x: 45, y: 110 }, { x: 43, y: 135 },
+            { x: 48, y: 160 }, { x: 64, y: 185 }, { x: 89, y: 201 },
+            { x: 114, y: 206 }, { x: 139, y: 210 }, { x: 164, y: 227 },
+            { x: 190, y: 252 }, { x: 191, y: 277 }, { x: 181, y: 302 },
+            { x: 148, y: 323 }, { x: 123, y: 332 }, { x: 98, y: 334 },
+            { x: 73, y: 346 }, { x: 52, y: 369 }, { x: 43, y: 394 },
+            { x: 43, y: 419 }, { x: 51, y: 444 }, { x: 70, y: 468 },
+            { x: 95, y: 481 },
+            { x: 120, y: 484 }, { x: 145, y: 484 }, { x: 170, y: 484 },
+            { x: 195, y: 484 }, { x: 219, y: 486 }, { x: 242, y: 485 },
+            { x: 267, y: 485 }, { x: 292, y: 485 }, { x: 317, y: 485 },
+            { x: 342, y: 485 }, { x: 367, y: 485 }, { x: 392, y: 485 },
+            { x: 417, y: 485 }, { x: 442, y: 485 }, { x: 467, y: 485 },
+            { x: 492, y: 480 }, { x: 517, y: 466 }, { x: 542, y: 442 },
+            { x: 567, y: 423 }, { x: 592, y: 448 }, { x: 637, y: 471 },
+            { x: 642, y: 483 }, { x: 667, y: 485 }, { x: 692, y: 480 },
+            { x: 717, y: 464 }, { x: 745, y: 439 }, { x: 752, y: 414 },
+            { x: 737, y: 389 }, { x: 736, y: 364 }, { x: 704, y: 342 },
+            { x: 679, y: 333 }, { x: 654, y: 332 }, { x: 629, y: 338 },
+            { x: 604, y: 356 }, { x: 579, y: 381 }, { x: 554, y: 386 },
+            { x: 529, y: 361 }, { x: 504, y: 340 },
+            { x: 479, y: 332 }, { x: 454, y: 331 }, { x: 429, y: 331 },
+            { x: 404, y: 332 }, { x: 379, y: 331 }, { x: 354, y: 331 },
+            { x: 329, y: 340 }, { x: 304, y: 340 },
+            { x: 279, y: 316 }, { x: 261, y: 291 }, { x: 256, y: 266 },
+            { x: 264, y: 241 }, { x: 285, y: 218 },
+            { x: 310, y: 208 }, { x: 335, y: 207 }, { x: 360, y: 207 },
+            { x: 385, y: 207 }, { x: 410, y: 207 }, { x: 435, y: 207 },
+            { x: 460, y: 207 }, { x: 485, y: 207 }, { x: 510, y: 207 },
+            { x: 535, y: 207 }, { x: 560, y: 206 }, { x: 585, y: 207 },
+            { x: 610, y: 207 }, { x: 635, y: 207 }, { x: 660, y: 207 },
+            { x: 685, y: 204 },
+            { x: 710, y: 192 }, { x: 735, y: 168 }, { x: 742, y: 143 },
+            { x: 749, y: 118 }, { x: 750, y: 93 }, { x: 710, y: 69 },
+            { x: 685, y: 56 }, { x: 660, y: 53 }, { x: 635, y: 53 },
+            { x: 610, y: 53 }, { x: 585, y: 53 }, { x: 560, y: 53 },
+            { x: 535, y: 53 }, { x: 510, y: 53 }, { x: 485, y: 53 },
+            { x: 460, y: 53 }, { x: 435, y: 53 }, { x: 410, y: 53 },
+            { x: 385, y: 53 }, { x: 360, y: 53 }, { x: 335, y: 53 },
+            { x: 310, y: 53 }, { x: 285, y: 53 }, { x: 260, y: 53 },
+            { x: 235, y: 53 },
+        ];
+
+        // ── NORMALS ───────────────────────────────────────────────────────────────
+        function getSmoothedNormal(i, win = 5) {
+            const n = centerPoints.length;
+            let dx = 0, dy = 0;
+            for (let k = -win; k <= win; k++) {
+                const a = centerPoints[((i + k) % n + n) % n];
+                const b = centerPoints[((i + k + 1) % n + n) % n];
+                dx += b.x - a.x;
+                dy += b.y - a.y;
+            }
+            const len = Math.sqrt(dx * dx + dy * dy) || 1;
+            return { nx: -dy / len, ny: dx / len };
+        }
+
+        function computeBoundaries(offset) {
+            const left = [], right = [];
+            for (let i = 0; i < centerPoints.length; i++) {
+                const { nx, ny } = getSmoothedNormal(i);
+                left.push({ x: Math.round(centerPoints[i].x + nx * offset), y: Math.round(centerPoints[i].y + ny * offset) });
+                right.push({ x: Math.round(centerPoints[i].x - nx * offset), y: Math.round(centerPoints[i].y - ny * offset) });
+            }
+            return { left, right };
+        }
+
+        // ── CANVAS ────────────────────────────────────────────────────────────────
+        const canvas = document.getElementById('trackCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // ── JEEP STATE ────────────────────────────────────────────────────────────
+        let jeepIdx = 0;          // current index into centerPoints
+        let jeepRunning = false;
+        let animFrame = null;
+        let lastTime = null;
+        let fractionalIdx = 0;         // sub-point progress for smooth movement
+
+        // ── DRAW ──────────────────────────────────────────────────────────────────
+        function drawDots(points, color, radius) {
+            ctx.fillStyle = color;
+            for (const p of points) {
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, radius, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function drawPath(points, color, dash, closed) {
+            if (points.length < 2) return;
+            ctx.beginPath();
+            ctx.moveTo(points[0].x, points[0].y);
+            for (let i = 1; i < points.length; i++) ctx.lineTo(points[i].x, points[i].y);
+            if (closed) ctx.lineTo(points[0].x, points[0].y);
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 1;
+            ctx.setLineDash(dash);
+            ctx.stroke();
+            ctx.setLineDash([]);
+        }
+
+        function drawJeep(x, y, heading) {
+            const R = 10; // jeep dot radius
+
+            // Outer glow ring
+            ctx.beginPath();
+            ctx.arc(x, y, R + 5, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(255,48,48,0.18)';
+            ctx.fill();
+
+            // White ring
+            ctx.beginPath();
+            ctx.arc(x, y, R + 2, 0, Math.PI * 2);
+            ctx.strokeStyle = 'rgba(255,255,255,0.6)';
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+
+            // Red body
+            ctx.beginPath();
+            ctx.arc(x, y, R, 0, Math.PI * 2);
+            ctx.fillStyle = '#ff3030';
+            ctx.fill();
+
+            // Direction arrow
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate(heading);
+            ctx.beginPath();
+            ctx.moveTo(R + 2, 0);
+            ctx.lineTo(R - 4, -4);
+            ctx.lineTo(R - 4, 4);
+            ctx.closePath();
+            ctx.fillStyle = '#fff';
+            ctx.fill();
+            ctx.restore();
+        }
+
+        function render() {
+            const offset = parseInt(document.getElementById('offsetSlider').value);
+            const radius = parseInt(document.getElementById('dotSize').value);
+            const showC = document.getElementById('showCenter').checked;
+            const showL = document.getElementById('showLeft').checked;
+            const showR = document.getElementById('showRight').checked;
+            const showB = document.getElementById('showBand').checked;
+
+            document.getElementById('offsetVal').textContent = offset + 'px';
+            document.getElementById('dotVal').textContent = radius;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const { left, right } = computeBoundaries(offset);
+
+            // Band
+            if (showB) {
+                ctx.beginPath();
+                ctx.moveTo(left[0].x, left[0].y);
+                for (const p of left) ctx.lineTo(p.x, p.y);
+                for (let i = right.length - 1; i >= 0; i--) ctx.lineTo(right[i].x, right[i].y);
+                ctx.closePath();
+                ctx.fillStyle = 'rgba(255,255,255,0.07)';
+                ctx.fill();
+            }
+
+            if (showL) { drawPath(left, 'rgba(240,192,32,0.35)', [4, 4], true); drawDots(left, '#f0c020', radius); }
+            if (showR) { drawPath(right, 'rgba(32,208,224,0.35)', [4, 4], true); drawDots(right, '#20d0e0', radius); }
+            if (showC) { drawPath(centerPoints, 'rgba(57,255,20,0.2)', [4, 6], true); drawDots(centerPoints, '#39ff14', radius); }
+
+            // Jeep — interpolate between two center points for smooth motion
+            const n = centerPoints.length;
+            const idx = Math.floor(fractionalIdx) % n;
+            const nxt = (idx + 1) % n;
+            const t = fractionalIdx - Math.floor(fractionalIdx);
+            const jx = centerPoints[idx].x * (1 - t) + centerPoints[nxt].x * t;
+            const jy = centerPoints[idx].y * (1 - t) + centerPoints[nxt].y * t;
+
+            // Heading angle from current to next point
+            const dx = centerPoints[nxt].x - centerPoints[idx].x;
+            const dy = centerPoints[nxt].y - centerPoints[idx].y;
+            const heading = Math.atan2(dy, dx);
+
+            drawJeep(jx, jy, heading);
+
+            // Update coordinate display
+            document.getElementById('coordX').textContent = Math.round(jx);
+            document.getElementById('coordY').textContent = Math.round(jy);
+            document.getElementById('coordIdx').textContent = `[${idx}/${n}]`;
+        }
+
+        // ── ANIMATION LOOP ────────────────────────────────────────────────────────
+        function animate(timestamp) {
+            if (!lastTime) lastTime = timestamp;
+            const delta = timestamp - lastTime;
+            lastTime = timestamp;
+
+            const speed = parseFloat(document.getElementById('speedSlider').value);
+            // speed = points per second; convert to points per millisecond × delta
+            const ptsPerMs = speed / 1000;
+            fractionalIdx = (fractionalIdx + ptsPerMs * delta) % centerPoints.length;
+
+            render();
+
+            if (jeepRunning) animFrame = requestAnimationFrame(animate);
+        }
+
+        // ── JEEP CONTROLS ────────────────────────────────────────────────────────
+        function setStatus(s) {
+            const badge = document.getElementById('statusBadge');
+            badge.textContent = s.toUpperCase();
+            badge.className = `status-${s}`;
+        }
+
+        document.getElementById('btnPlay').addEventListener('click', () => {
+            if (jeepRunning) return;
+            jeepRunning = true;
+            lastTime = null;
+            animFrame = requestAnimationFrame(animate);
+            setStatus('running');
+        });
+
+        document.getElementById('btnPause').addEventListener('click', () => {
+            if (!jeepRunning) return;
+            jeepRunning = false;
+            cancelAnimationFrame(animFrame);
+            setStatus('paused');
+            // Snapshot current position
+            render();
+        });
+
+        document.getElementById('btnReset').addEventListener('click', () => {
+            jeepRunning = false;
+            cancelAnimationFrame(animFrame);
+            fractionalIdx = 0;
+            lastTime = null;
+            setStatus('stopped');
+            render();
+        });
+
+        document.getElementById('speedSlider').addEventListener('input', function () {
+            document.getElementById('speedVal').textContent = this.value;
+        });
+
+        // ── TRACK CONTROLS ───────────────────────────────────────────────────────
+        ['offsetSlider', 'dotSize'].forEach(id =>
+            document.getElementById(id).addEventListener('input', render));
+        ['showCenter', 'showLeft', 'showRight', 'showBand'].forEach(id =>
+            document.getElementById(id).addEventListener('change', render));
+
+        // ── COPY ─────────────────────────────────────────────────────────────────
+        document.getElementById('copyBtn').addEventListener('click', () => {
+            const offset = parseInt(document.getElementById('offsetSlider').value);
+            const { left, right } = computeBoundaries(offset);
+            const fmt = (arr, name) =>
+                `const ${name} = [\n    ` +
+                arr.map(p => `{ x: ${p.x}, y: ${p.y} }`).join(', ') + '\n];';
+            const out = [
+                `// Total track width: ${offset * 2}px  (${offset}px per side)`,
+                '', fmt(centerPoints, 'centerPoints'),
+                '', fmt(left, 'leftPoints'),
+                '', fmt(right, 'rightPoints')
+            ].join('\n');
+            navigator.clipboard.writeText(out)
+                .then(() => alert(`Copied! Offset = ${offset}px per side (${offset * 2}px total).`))
+                .catch(() => { console.log(out); alert('Check console for arrays.'); });
+        });
+
+        // ── CLICK TO LOG POINT ────────────────────────────────────────────────────
+        canvas.addEventListener('click', e => {
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            const x = Math.round((e.clientX - rect.left) * scaleX);
+            const y = Math.round((e.clientY - rect.top) * scaleY);
+            console.log(`{ x: ${x}, y: ${y} },`);
+        });
+
+        // Initial draw
+        render();
+    </script>
+</body>
+
+</html>
