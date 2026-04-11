@@ -281,6 +281,20 @@
         </div>
     </div>
 
+<!-----Animal detection system using uolo and flask-------->
+<div class="weather-box enhanced">
+    <h3>🧠 Animal Detection</h3>
+
+    <input type="file" id="imageInput">
+    <button onclick="detectAnimal()">Detect</button>
+
+    <br><br>
+
+    <img id="resultImage" width="300">
+
+    <p id="resultText"></p>
+</div>
+
 
     <div id="vetPopup" class="vet-popup">
         🐾 Animal Welfare Vet <br>
@@ -301,6 +315,28 @@
             window.location.href = "index.html";
         }
     </script>
+    <script>
+async function detectAnimal() {
+    const fileInput = document.getElementById("imageInput");
+
+    let formData = new FormData();
+    formData.append("image", fileInput.files[0]);
+
+    let res = await fetch("http://127.0.0.1:5000/detect", {
+        method: "POST",
+        body: formData
+    });
+
+    let data = await res.json();
+
+    document.getElementById("resultImage").src =
+        "http://127.0.0.1:5000" + data.image;
+
+    document.getElementById("resultText").innerText =
+        "Detected: " + data.animals.join(", ");
+}
+</script>
+
     <script type="module" src="../js/script.js"></script>
 
 </body>
