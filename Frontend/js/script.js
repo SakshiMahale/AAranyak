@@ -801,7 +801,6 @@ async function cleanupExpiredSafaris() {
     const now = Date.now();
 
     const userRef = ref(db, "safariSystem/user");
-    const jeepRef = ref(db, "safariSystem/jeep");
 
     const userSnap = await get(userRef);
 
@@ -813,10 +812,18 @@ async function cleanupExpiredSafaris() {
 
         const user = users[uid];
 
+        // ✅ skip if already moved
+        if (user.movedToHistory) continue;
+
         // ✅ CHECK IF SLOT EXPIRED
         if (user.endTime && now > user.endTime) {
 
             console.log("⏳ Expired user:", uid);
+
+            // 🔥 MARK FIRST (VERY IMPORTANT)
+            await update(ref(db, "safariSystem/user/" + uid), {
+                movedToHistory: true
+            });
 
             // ================= MOVE TO HISTORY =================
             await push(ref(db, "history/" + uid), {
@@ -830,14 +837,12 @@ async function cleanupExpiredSafaris() {
                 const jeepUserRef = ref(db, `safariSystem/jeep/${user.jeepId}/users/${uid}`);
                 await set(jeepUserRef, null);
 
-                // 🔥 UPDATE SEAT COUNT
                 const jeepSnap = await get(ref(db, `safariSystem/jeep/${user.jeepId}`));
 
                 if (jeepSnap.exists()) {
 
                     const jeepData = jeepSnap.val();
                     let currentSeats = jeepData.seatCount || 0;
-
                     let userSeats = user.seatsBooked || 0;
 
                     let newSeats = currentSeats - userSeats;
@@ -848,10 +853,10 @@ async function cleanupExpiredSafaris() {
                 }
             }
 
-            // ================= REMOVE USER =================
+            // ✅ REMOVE USER FINALLY
             await set(ref(db, "safariSystem/user/" + uid), null);
 
-            console.log("✅ Moved to history & cleaned jeep");
+            console.log("✅ Moved to history ONCE only");
         }
     }
 }
