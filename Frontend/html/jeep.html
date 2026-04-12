@@ -96,13 +96,13 @@
 
         <!-- ACTIVE -->
         <div class="box">
-            <h2>🌿 Active Jeeps (Max 6)</h2>
+            <h2> Active Jeeps (Max 6)</h2>
             <div id="active"></div>
         </div>
 
         <!-- WAITING -->
         <div class="box">
-            <h2>⏳ Waiting Jeeps</h2>
+            <h2> Waiting Jeeps</h2>
             <div id="waiting"></div>
         </div>
 
@@ -137,7 +137,7 @@
             render();
         }
 
-        // ❌ Remove Jeep (checkout)
+        //  Remove Jeep (checkout)
         function removeJeep() {
             if (activeJeeps.length === 0) return;
 
@@ -157,7 +157,7 @@
             render();
         }, 1000);
 
-        // 🎨 Render UI
+        //  Render UI
         function render() {
             const activeDiv = document.getElementById("active");
             const waitingDiv = document.getElementById("waiting");
